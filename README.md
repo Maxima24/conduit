@@ -538,7 +538,7 @@ conduit/
 │           │   ├── reconciliation/  # gaps, deep-link, CSV export, health strip
 │           │   └── stats/           # overview counts
 │           ├── lib/                 # api-client, query-client, query-keys, sse, filters, format
-│           ├── stores/              # Zustand: filters, selection, toast, stream
+│           ├── stores/              # Zustand: filters, selection, toast, streaam
 │           └── mocks/               # API-shaped fixtures + adapter (mock mode)
 ├── packages/
 │   ├── contracts/                  # shared DTOs, enums, zod schemas, routes, SSE contract (source of truth)
@@ -927,36 +927,62 @@ This section is deliberately explicit so reviewers know exactly what is live ver
 
 ## Contributors
 
-Built for the [APIConf 2026 Lagos Developer Challenge](https://apiconf.net/hackathon) by a team of four, each owning a vertical slice of the pipe:
+<div align="center">
+
+<img src="https://api.iconify.design/lucide/users.svg?color=%236C4CF1" width="22" align="center" /> **Four developers · two days · one pipe** — built for the [APIConf 2026 Lagos Developer Challenge](https://apiconf.net/hackathon).
+
+<br/>
 
 <table>
   <tr>
-    <td align="center" width="25%">
-      <a href="https://github.com/Maxima24"><img src="https://github.com/Maxima24.png" width="84" alt="Maxima24" /></a><br/>
-      <a href="https://github.com/Maxima24"><b>@Maxima24</b></a><br/>
-      <sub><b>Backend 1</b></sub><br/>
-      <sub>Ingest · persistence · events API</sub>
+    <td align="center" width="25%" valign="top">
+      <a href="https://github.com/Maxima24"><img src="https://github.com/Maxima24.png?size=200" width="96" alt="Maxima24" /></a>
+      <br/><br/>
+      <a href="https://github.com/Maxima24"><b>@Maxima24</b></a>
+      <br/>
+      <img src="https://img.shields.io/badge/Backend_1-E0234E" alt="Backend 1" />
+      <br/><br/>
+      <sub><img src="https://api.iconify.design/lucide/database.svg?color=%23888" width="12" /> Ingest · persistence<br/>events read API</sub>
+      <br/><br/>
+      <a href="https://github.com/Maxima24"><img src="https://img.shields.io/github/followers/Maxima24?label=Follow&style=social" alt="Follow @Maxima24" /></a>
     </td>
-    <td align="center" width="25%">
-      <a href="https://github.com/professor-12"><img src="https://github.com/professor-12.png" width="84" alt="professor-12" /></a><br/>
-      <a href="https://github.com/professor-12"><b>@professor-12</b></a><br/>
-      <sub><b>Backend 2</b></sub><br/>
-      <sub>Delivery · DLQ · reconciler · SSE</sub>
+    <td align="center" width="25%" valign="top">
+      <a href="https://github.com/professor-12"><img src="https://github.com/professor-12.png?size=200" width="96" alt="professor-12" /></a>
+      <br/><br/>
+      <a href="https://github.com/professor-12"><b>@professor-12</b></a>
+      <br/>
+      <img src="https://img.shields.io/badge/Backend_2-E0234E" alt="Backend 2" />
+      <br/><br/>
+      <sub><img src="https://api.iconify.design/lucide/send.svg?color=%23888" width="12" /> Delivery · DLQ<br/>reconciler · SSE</sub>
+      <br/><br/>
+      <a href="https://github.com/professor-12"><img src="https://img.shields.io/github/followers/professor-12?label=Follow&style=social" alt="Follow @professor-12" /></a>
     </td>
-    <td align="center" width="25%">
-      <a href="https://github.com/ZEED2468"><img src="https://github.com/ZEED2468.png" width="84" alt="ZEED2468" /></a><br/>
-      <a href="https://github.com/ZEED2468"><b>@ZEED2468</b></a><br/>
-      <sub><b>Frontend 1</b></sub><br/>
-      <sub>App shell · event stream · detail</sub>
+    <td align="center" width="25%" valign="top">
+      <a href="https://github.com/ZEED2468"><img src="https://github.com/ZEED2468.png?size=200" width="96" alt="ZEED2468" /></a>
+      <br/><br/>
+      <a href="https://github.com/ZEED2468"><b>@ZEED2468</b></a>
+      <br/>
+      <img src="https://img.shields.io/badge/Frontend_1-3178C6" alt="Frontend 1" />
+      <br/><br/>
+      <sub><img src="https://api.iconify.design/lucide/layout-dashboard.svg?color=%23888" width="12" /> App shell · event<br/>stream · detail</sub>
+      <br/><br/>
+      <a href="https://github.com/ZEED2468"><img src="https://img.shields.io/github/followers/ZEED2468?label=Follow&style=social" alt="Follow @ZEED2468" /></a>
     </td>
-    <td align="center" width="25%">
-      <a href="https://github.com/Ferousco-dev"><img src="https://github.com/Ferousco-dev.png" width="84" alt="Ferousco-dev" /></a><br/>
-      <a href="https://github.com/Ferousco-dev"><b>@Ferousco-dev</b></a><br/>
-      <sub><b>Frontend 2</b></sub><br/>
-      <sub>DLQ · reconciliation · stats</sub>
+    <td align="center" width="25%" valign="top">
+      <a href="https://github.com/Ferousco-dev"><img src="https://github.com/Ferousco-dev.png?size=200" width="96" alt="Ferousco-dev" /></a>
+      <br/><br/>
+      <a href="https://github.com/Ferousco-dev"><b>@Ferousco-dev</b></a>
+      <br/>
+      <img src="https://img.shields.io/badge/Frontend_2-3178C6" alt="Frontend 2" />
+      <br/><br/>
+      <sub><img src="https://api.iconify.design/lucide/scan-search.svg?color=%23888" width="12" /> DLQ · reconciliation<br/>dashboard · stats</sub>
+      <br/><br/>
+      <a href="https://github.com/Ferousco-dev"><img src="https://img.shields.io/github/followers/Ferousco-dev?label=Follow&style=social" alt="Follow @Ferousco-dev" /></a>
     </td>
   </tr>
 </table>
+
+</div>
 
 ## License
 
