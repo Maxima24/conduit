@@ -47,8 +47,14 @@ export function mockResolve<T>(path: string, init?: RequestInit): Promise<T> {
     return Promise.resolve({ ...source, id, status: 'pending', deliveredAt: null } as T);
   }
   if (rawPath === '/sends') {
-    const items = mockSends.items.filter((s) => !replayed.has(s.id));
-    return Promise.resolve({ ...mockSends, items, total: items.length } as T);
+    const params = new URLSearchParams(path.split('?')[1] ?? '');
+    const all = mockSends.items.filter((s) => !replayed.has(s.id));
+    const limit = Number(params.get('limit') ?? '20');
+    const start = Number(params.get('cursor') ?? '0');
+    const page = all.slice(start, start + limit);
+    const nextStart = start + limit;
+    const nextCursor = nextStart < all.length ? String(nextStart) : null;
+    return Promise.resolve({ items: page, nextCursor, total: all.length } as T);
   }
 
   if (rawPath === '/reconcile') {

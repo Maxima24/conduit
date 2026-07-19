@@ -11,9 +11,11 @@ export const queryKeys = {
   sends: {
     all: ['sends'] as const,
     list: (f: SendFilters) => [...queryKeys.sends.all, 'list', f] as const,
+    infinite: (f: SendFilters) => [...queryKeys.sends.all, 'infinite', f] as const,
   },
   reconcile: {
-    report: (r?: DateRange) => ['reconcile', 'report', r ?? null] as const,
+    all: ['reconcile'] as const,
+    report: (r?: DateRange) => [...queryKeys.reconcile.all, 'report', r ?? null] as const,
   },
   stats: {
     current: () => ['stats'] as const,
