@@ -1,7 +1,30 @@
+import type { GapType, ReconcileReportDto } from '@conduit/contracts';
 import { mockEventDetail, mockEvents, mockReport, mockSends, mockStats } from './fixtures';
 
 export function isMockMode(): boolean {
   return process.env.NEXT_PUBLIC_USE_MOCKS === 'true';
+}
+
+/** Filter the mock report to a time window so gap filtering is exercisable. */
+function reportInWindow(from: string | null, to: string | null): ReconcileReportDto {
+  if (!from && !to) return mockReport;
+
+  const fromMs = from ? Date.parse(from) : Number.NEGATIVE_INFINITY;
+  const toMs = to ? Date.parse(to) : Number.POSITIVE_INFINITY;
+  const gaps = mockReport.gaps.filter((g) => {
+    const at = Date.parse(g.detectedAt);
+    return at >= fromMs && at <= toMs;
+  });
+
+  const summary = gaps.reduce(
+    (acc, g) => ({ ...acc, [g.type]: acc[g.type] + 1, total: acc.total + 1 }),
+    { no_send: 0, orphan_send: 0, duplicate_send: 0, stuck: 0, total: 0 } as Record<
+      GapType,
+      number
+    > & { total: number },
+  );
+
+  return { ...mockReport, gaps, summary, invariantHolds: gaps.length === 0 };
 }
 
 // Session-local state so replay behaves believably: a replayed send leaves the
@@ -28,7 +51,10 @@ export function mockResolve<T>(path: string, init?: RequestInit): Promise<T> {
     return Promise.resolve({ ...mockSends, items, total: items.length } as T);
   }
 
-  if (rawPath === '/reconcile') return Promise.resolve(mockReport as T);
+  if (rawPath === '/reconcile') {
+    const params = new URLSearchParams(path.split('?')[1] ?? '');
+    return Promise.resolve(reportInWindow(params.get('from'), params.get('to')) as T);
+  }
   if (rawPath === '/stats') return Promise.resolve(mockStats as T);
 
   return Promise.reject(new Error(`No mock registered for ${path}`));
