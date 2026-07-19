@@ -30,8 +30,8 @@ model WebhookEvent {
   outbox         OutboxJob[]
 
   @@unique([source, idempotencyKey]) // the correctness guarantee (per-source idempotency)
-  @@index([status, receivedAt])
-  @@index([source, receivedAt])
+  @@index([status, receivedAt, id]) // covers filter + keyset sort (receivedAt, id)
+  @@index([source, receivedAt, id])
   @@map("webhook_events")
 }
 
@@ -68,7 +68,7 @@ model Send {
   attemptHistory Attempt[]
   gaps           ReconcileGap[]
 
-  @@index([status, createdAt])
+  @@index([status, createdAt, id]) // covers filter + keyset sort (createdAt, id)
   @@index([causedBy])
   @@map("sends")
 }
