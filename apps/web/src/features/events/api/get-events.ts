@@ -2,14 +2,10 @@ import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query';
 import { API_ROUTES, type EventDto, type Paginated } from '@conduit/contracts';
 import { api } from '@/lib/api-client';
 import { queryKeys } from '@/lib/query-keys';
-import type { EventFilters } from '@/lib/filters';
+import { eventFiltersToSearchParams, type EventFilters } from '@/lib/filters';
 
 function toParams(f: EventFilters, cursor?: string): string {
-  const p = new URLSearchParams();
-  if (f.status) p.set('status', f.status);
-  if (f.source) p.set('source', f.source);
-  if (f.from) p.set('from', f.from);
-  if (f.to) p.set('to', f.to);
+  const p = eventFiltersToSearchParams(f);
   if (cursor) p.set('cursor', cursor);
   const s = p.toString();
   return s ? `?${s}` : '';

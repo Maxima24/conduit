@@ -1,4 +1,5 @@
 import { API_ROUTES, type GapDto } from '@conduit/contracts';
+import { withHighlight } from '@/lib/deep-link';
 
 /**
  * Deep-link a gap to the offending event or send.
@@ -10,6 +11,5 @@ import { API_ROUTES, type GapDto } from '@conduit/contracts';
  */
 export function gapDeepLink(gap: GapDto): string | null {
   if (!gap.eventId) return null;
-  const base = API_ROUTES.events.detail(gap.eventId);
-  return gap.sendId ? `${base}?highlight=${encodeURIComponent(gap.sendId)}` : base;
+  return withHighlight(API_ROUTES.events.detail(gap.eventId), gap.sendId);
 }
