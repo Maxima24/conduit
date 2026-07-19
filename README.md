@@ -24,6 +24,10 @@
 ![Build](https://img.shields.io/badge/build-placeholder-lightgrey)
 ![License](https://img.shields.io/badge/license-TBD-lightgrey)
 
+<br/>
+
+<samp>[**Problem**](#problem-statement)&nbsp;&nbsp;·&nbsp;&nbsp;[**Metric**](#the-defensible-metric)&nbsp;&nbsp;·&nbsp;&nbsp;[**Architecture**](#system-architecture)&nbsp;&nbsp;·&nbsp;&nbsp;[**Monnify**](#monnify-integration)&nbsp;&nbsp;·&nbsp;&nbsp;[**API**](#api-documentation)&nbsp;&nbsp;·&nbsp;&nbsp;[**Quickstart**](#installation)</samp>
+
 </div>
 
 ---
@@ -42,7 +46,7 @@
 - [The Defensible Metric](#the-defensible-metric)
 - [Key Features](#key-features)
 - [Screenshots](#screenshots)
-- [Demo Links](#demo-links)
+- [Demo](#demo)
 - [Tech Stack](#tech-stack)
 - [System Architecture](#system-architecture)
 - [How It Works](#how-it-works)
@@ -118,6 +122,15 @@ The `causedBy` field is the thread that links every outbound send back to the in
 
 The claim isn't "trust us" — it's measurable. The test: run **N events with injected duplicates, ~15% provider failures, and a mid-processing crash**, first through a naive receiver (processes every webhook and fires sends inline, no idempotency, no retry, no reconciliation), then through Conduit.
 
+<div align="center">
+
+![Duplicate sends](https://img.shields.io/badge/duplicate_sends-0-2ea44f?labelColor=2b2b2b)
+![Lost on crash](https://img.shields.io/badge/lost_on_crash-0-2ea44f?labelColor=2b2b2b)
+![Failed sends recovered](https://img.shields.io/badge/failed_sends_recovered-100%25-2ea44f?labelColor=2b2b2b)
+![Gaps caught](https://img.shields.io/badge/injected_gaps_caught-100%25-2ea44f?labelColor=2b2b2b)
+
+</div>
+
 | Metric                              | Naive baseline        | With Conduit            |
 | ----------------------------------- | --------------------- | ----------------------- |
 | Duplicate outbound sends            | occurs on every retry | **0** — idempotency     |
@@ -178,19 +191,51 @@ The claim isn't "trust us" — it's measurable. The test: run **N events with in
 
 ## Screenshots
 
-> _Placeholders — replace with real captures before submission._
+> Placeholder tiles below — swap for real captures in `docs/screenshots/` before submission.
 
-| Events stream                                            | Reconciliation dashboard                                                 |
-| -------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `![Events](docs/screenshots/events.png)` _(placeholder)_ | `![Reconciliation](docs/screenshots/reconciliation.png)` _(placeholder)_ |
+<div align="center">
 
-| DLQ + replay                                       | Event delivery timeline                                      |
-| -------------------------------------------------- | ------------------------------------------------------------ |
-| `![DLQ](docs/screenshots/dlq.png)` _(placeholder)_ | `![Timeline](docs/screenshots/timeline.png)` _(placeholder)_ |
+<table>
+  <tr>
+    <td align="center"><img src="https://placehold.co/440x260/0b0e14/8b97ad?text=Events+stream" width="100%" alt="Events stream" /><br/><sub><b>Events stream</b> — live, filterable, cursor-paginated</sub></td>
+    <td align="center"><img src="https://placehold.co/440x260/0b0e14/8b97ad?text=Reconciliation" width="100%" alt="Reconciliation dashboard" /><br/><sub><b>Reconciliation</b> — gaps grouped by type, deep-linked</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="https://placehold.co/440x260/0b0e14/8b97ad?text=DLQ+%2B+replay" width="100%" alt="DLQ and replay" /><br/><sub><b>DLQ + replay</b> — per-row & bulk, optimistic</sub></td>
+    <td align="center"><img src="https://placehold.co/440x260/0b0e14/8b97ad?text=Delivery+timeline" width="100%" alt="Delivery timeline" /><br/><sub><b>Delivery timeline</b> — every attempt + backoff gap</sub></td>
+  </tr>
+</table>
 
-## Demo Links
+</div>
 
-> _Placeholders — fill in once deployed._
+## Demo
+
+**In under three minutes — the storyboard:**
+
+<table>
+  <tr>
+    <td width="40" align="center"><img src="https://api.iconify.design/lucide/play.svg?color=%236C4CF1" width="20" /></td>
+    <td>Start the seed generator — realistic events stream into the table <b>live</b>.</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="https://api.iconify.design/lucide/list-tree.svg?color=%236C4CF1" width="20" /></td>
+    <td>Open an event — see the <b>delivery timeline</b>: each attempt, its status, error, and backoff gap.</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="https://api.iconify.design/lucide/copy-check.svg?color=%236C4CF1" width="20" /></td>
+    <td>Point at the <b>duplicate-webhook counter</b> — the event was processed once, not twice.</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="https://api.iconify.design/lucide/rotate-ccw.svg?color=%236C4CF1" width="20" /></td>
+    <td>Open the <b>DLQ</b>, replay a failed send, and watch it recover.</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="https://api.iconify.design/lucide/scan-search.svg?color=%236C4CF1" width="20" /></td>
+    <td>Open the <b>reconciliation dashboard</b> — an injected gap is flagged and links straight to its source event.</td>
+  </tr>
+</table>
+
+**Links** _(fill in once deployed):_
 
 - **Live app:** `https://<your-vercel-app>.vercel.app` _(placeholder)_
 - **API:** `https://<your-render-service>.onrender.com` _(placeholder)_
@@ -454,6 +499,9 @@ The resulting receipt is a `Send` with `causedBy` set to this event's `id`, so t
 
 ## Project Structure
 
+<details>
+<summary><b>Repository layout</b> — two apps + a shared contract package (click to expand)</summary>
+
 ```
 conduit/
 ├── apps/
@@ -490,7 +538,7 @@ conduit/
 │           │   ├── reconciliation/  # gaps, deep-link, CSV export, health strip
 │           │   └── stats/           # overview counts
 │           ├── lib/                 # api-client, query-client, query-keys, sse, filters, format
-│           ├── stores/              # Zustand: filters, selection, toast, stream
+│           ├── stores/              # Zustand: filters, selection, toast, streaam
 │           └── mocks/               # API-shaped fixtures + adapter (mock mode)
 ├── packages/
 │   ├── contracts/                  # shared DTOs, enums, zod schemas, routes, SSE contract (source of truth)
@@ -501,6 +549,8 @@ conduit/
 ├── turbo.json                      # task graph
 └── pnpm-workspace.yaml             # workspaces + version catalog
 ```
+
+</details>
 
 `packages/contracts` is the backbone: **no wire type is defined outside it**, and both apps import it, so the frontend and backend can never drift.
 
@@ -522,6 +572,11 @@ Copy the example and fill in secrets:
 cp .env.example .env
 ```
 
+<details>
+<summary><b>All environment variables</b> (click to expand)</summary>
+
+<br/>
+
 | Variable                  | Scope | Description                                                                                                                                                               |
 | ------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `DATABASE_URL`            | API   | PostgreSQL connection string. Defaults point at the Docker service on host port **5435**.                                                                                 |
@@ -533,6 +588,8 @@ cp .env.example .env
 | `WEBHOOK_SECRET_<SOURCE>` | API   | Per-source HMAC secret, e.g. `WEBHOOK_SECRET_MONNIFY` (your Monnify client secret). If unset for a source, signature verification is **skipped in dev** (with a warning). |
 | `NEXT_PUBLIC_API_URL`     | Web   | Base URL of the API (exposed to the browser).                                                                                                                             |
 | `NEXT_PUBLIC_USE_MOCKS`   | Web   | `true` renders every view against in-memory fixtures; `false` hits the live API.                                                                                          |
+
+</details>
 
 > The API validates its environment at boot with Zod (`apps/api/src/config/env.schema.ts`) — an invalid or missing required variable fails fast with a clear message.
 
@@ -596,13 +653,18 @@ Base URL: `http://localhost:3001`. All list endpoints are **cursor-paginated** a
 
 ### Request / Response Examples
 
+<details>
+<summary><b>Show request/response examples</b> — ingest, list, reconcile, error envelope</summary>
+
+<br/>
+
 **Ingest a webhook**
 
 ```bash
-curl -X POST http://localhost:3001/webhooks/stripe \
+curl -X POST http://localhost:3001/webhooks/monnify \
   -H "Content-Type: application/json" \
   -H "x-signature: <hex HMAC-SHA256 of the raw body>" \
-  -d '{ "id": "evt_stripe_001", "type": "payment_intent.succeeded", "amount": 4200 }'
+  -d '{ "eventType": "SUCCESSFUL_TRANSACTION", "eventData": { "transactionReference": "MNFY|20260719|0001", "amountPaid": "4200.00" } }'
 ```
 
 ```jsonc
@@ -673,9 +735,11 @@ curl "http://localhost:3001/reconcile"
   "code": "INVALID_SIGNATURE",
   "message": "Invalid signature",
   "timestamp": "2026-07-19T12:00:00.000Z",
-  "path": "/webhooks/stripe",
+  "path": "/webhooks/monnify",
 }
 ```
+
+</details>
 
 **Conventions**
 
@@ -865,12 +929,34 @@ This section is deliberately explicit so reviewers know exactly what is live ver
 
 Built for the [APIConf 2026 Lagos Developer Challenge](https://apiconf.net/hackathon) by a team of four, each owning a vertical slice of the pipe:
 
-| Role    | GitHub                                           | Area                                            |
-| ------- | ------------------------------------------------ | ----------------------------------------------- |
-| **BE1** | [@Maxima24](https://github.com/Maxima24)         | Ingest, persistence, events read API            |
-| **BE2** | [@professor-12](https://github.com/professor-12) | Delivery, retry/DLQ, reconciliation, SSE, stats |
-| **FE1** | [@ZEED2468](https://github.com/ZEED2468)         | App shell, event stream, event detail           |
-| **FE2** | [@Ferousco-dev](https://github.com/Ferousco-dev) | DLQ, reconciliation dashboard, stats            |
+<table>
+  <tr>
+    <td align="center" width="25%">
+      <a href="https://github.com/Maxima24"><img src="https://github.com/Maxima24.png" width="84" alt="Maxima24" /></a><br/>
+      <a href="https://github.com/Maxima24"><b>@Maxima24</b></a><br/>
+      <sub><b>Backend 1</b></sub><br/>
+      <sub>Ingest · persistence · events API</sub>
+    </td>
+    <td align="center" width="25%">
+      <a href="https://github.com/professor-12"><img src="https://github.com/professor-12.png" width="84" alt="professor-12" /></a><br/>
+      <a href="https://github.com/professor-12"><b>@professor-12</b></a><br/>
+      <sub><b>Backend 2</b></sub><br/>
+      <sub>Delivery · DLQ · reconciler · SSE</sub>
+    </td>
+    <td align="center" width="25%">
+      <a href="https://github.com/ZEED2468"><img src="https://github.com/ZEED2468.png" width="84" alt="ZEED2468" /></a><br/>
+      <a href="https://github.com/ZEED2468"><b>@ZEED2468</b></a><br/>
+      <sub><b>Frontend 1</b></sub><br/>
+      <sub>App shell · event stream · detail</sub>
+    </td>
+    <td align="center" width="25%">
+      <a href="https://github.com/Ferousco-dev"><img src="https://github.com/Ferousco-dev.png" width="84" alt="Ferousco-dev" /></a><br/>
+      <a href="https://github.com/Ferousco-dev"><b>@Ferousco-dev</b></a><br/>
+      <sub><b>Frontend 2</b></sub><br/>
+      <sub>DLQ · reconciliation · stats</sub>
+    </td>
+  </tr>
+</table>
 
 ## License
 
