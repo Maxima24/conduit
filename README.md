@@ -1,20 +1,36 @@
-# Conduit
+<div align="center">
 
-> **The Event Reliability SDK — receive, deliver, and reconcile every event, with proof.**
+# <img src="https://api.iconify.design/lucide/zap.svg?color=%236C4CF1" width="30" align="center" /> Conduit
 
-Conduit is a drop-in service and companion dashboard that makes event-driven plumbing reliable end to end. It **ingests inbound webhooks exactly once**, **delivers the resulting outbound notifications** (email / SMS / webhook) with retries and a dead-letter queue, and **continuously reconciles the two sides** so a developer can prove no event was lost, duplicated, or silently dropped.
+### The Event Reliability SDK — receive, deliver, and reconcile every event, _with proof_.
 
-> **The pitch, in one line:** _if you receive webhooks and send anything in response, you already need this._
+**If you receive webhooks and send anything in response, you already need this.**
 
-Reliable delivery of events, end to end, **with proof**. The webhook handler and the sender are the two ends of one pipe; the reconciler is the audit layer that makes the pipe trustworthy — turning three fragile, hand-rolled tools into one coherent product.
+<br/>
 
-<!-- Badges are placeholders until CI and a license file are added. -->
+[![APIConf 2026 Lagos](https://img.shields.io/badge/APIConf_2026_Lagos-Build_with_Monnify-6C4CF1?style=for-the-badge)](https://apiconf.net/hackathon)
 
+![NestJS](https://img.shields.io/badge/NestJS_11-E0234E?logo=nestjs&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js_16-000000?logo=nextdotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript_5.7-3178C6?logo=typescript&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL_16-4169E1?logo=postgresql&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma_7-2D3748?logo=prisma&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis_7-DC382D?logo=redis&logoColor=white)
+![BullMQ](https://img.shields.io/badge/BullMQ-b91c1c)
+
+![Node](https://img.shields.io/badge/node-%3E%3D20.19-3c873a?logo=nodedotjs&logoColor=white)
+![pnpm](https://img.shields.io/badge/pnpm-9.15-f69220?logo=pnpm&logoColor=white)
+![Tests](https://img.shields.io/badge/tests-24_passing-2ea44f)
 ![Build](https://img.shields.io/badge/build-placeholder-lightgrey)
-![Node](https://img.shields.io/badge/node-%3E%3D20.19-3c873a)
-![pnpm](https://img.shields.io/badge/pnpm-9.15-f69220)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178c6)
 ![License](https://img.shields.io/badge/license-TBD-lightgrey)
+
+</div>
+
+---
+
+**Conduit** is a drop-in service and companion dashboard that makes event-driven plumbing reliable end to end. It **ingests inbound webhooks exactly once**, **delivers the resulting outbound notifications** (email / SMS / webhook) with retries and a dead-letter queue, and **continuously reconciles the two sides** so a developer can prove no event was lost, duplicated, or silently dropped. The webhook handler and the sender are the two ends of one pipe; the reconciler is the audit layer that makes the pipe trustworthy — turning three fragile, hand-rolled tools into one coherent product.
+
+> <img src="https://api.iconify.design/lucide/trophy.svg?color=%236C4CF1" width="16" align="center" /> **Built for the [APIConf 2026 Lagos Developer Challenge](https://apiconf.net/hackathon) — "Build with Monnify."** Conduit is the reliability and reconciliation layer for [Monnify](https://monnify.com) payment webhooks: it ingests Monnify's transaction events **exactly once**, delivers the resulting receipts, and **proves** every successful payment was accounted for — no duplicate credits, no missed settlements, nothing silently dropped. Built against the Monnify **sandbox**. `#APIConfMonnifyDeveloperChallenge`
 
 ---
 
@@ -30,6 +46,7 @@ Reliable delivery of events, end to end, **with proof**. The webhook handler and
 - [Tech Stack](#tech-stack)
 - [System Architecture](#system-architecture)
 - [How It Works](#how-it-works)
+- [Monnify Integration](#monnify-integration)
 - [Project Structure](#project-structure)
 - [Installation](#installation)
   - [Prerequisites](#prerequisites)
@@ -61,14 +78,14 @@ Reliable delivery of events, end to end, **with proof**. The webhook handler and
 
 ## Problem Statement
 
-Every product that talks to other systems rebuilds the same fragile plumbing: an endpoint that receives webhooks (Stripe, Paystack, GitHub, a partner), logic that reacts to them, and an outbound send (a receipt email, an SMS, a webhook to yet another system). This plumbing fails in quiet, expensive ways:
+Every product that takes payments talks to a gateway over webhooks. A gateway like **Monnify** fires a webhook for every transaction event — a successful payment, a settlement, a disbursement, a refund — and your backend reacts to it: credit a wallet, send a receipt, notify a partner. This plumbing is where money quietly goes wrong:
 
-- The same webhook arrives twice — providers retry — and the customer is emailed twice or charged twice.
-- A webhook is received but the process crashes before finishing; the effect never happens and nobody notices.
-- An outbound provider is briefly down and the notification is simply lost.
-- Weeks later, nobody can answer _"did every payment event actually send its receipt?"_
+- The same transaction webhook arrives twice — gateways retry, and delivery is **at-least-once by design** — so the customer is credited twice or emailed two receipts.
+- A `SUCCESSFUL_TRANSACTION` webhook is received but the process crashes before finishing; the wallet is never credited and nobody notices.
+- The receipt provider is briefly down and the notification is simply lost.
+- At month-end, finance asks _"did every successful Monnify payment actually send its receipt, and does our ledger match the gateway's?"_ — and nobody can answer.
 
-Teams solve this ad hoc, badly, once per project.
+The same failure modes apply to any webhook source (GitHub, a partner API), but with payments they cost real money and trust. Teams solve this ad hoc, badly, once per project.
 
 ## Why Conduit
 
@@ -114,14 +131,50 @@ The claim isn't "trust us" — it's measurable. The test: run **N events with in
 
 ## Key Features
 
-- **Exactly-once ingest** — a unique `idempotencyKey` constraint makes duplicate webhooks return the original event instead of re-processing.
-- **Durable-before-processing** — the raw event is persisted before any work, so a mid-processing crash never loses it.
-- **Reliable delivery** — a BullMQ-backed queue drives retries with backoff + jitter and dead-letters exhausted sends.
-- **One-click / API replay** — dead-lettered sends can be re-enqueued individually or in bulk; replays are idempotent.
-- **Continuous reconciliation** — a background reconciler detects and persists gaps between events and their expected sends.
-- **Live dashboard** — a Next.js app with a live event stream, DLQ + replay UI, and a reconciliation gap explorer that deep-links each gap to the offending event.
-- **Live updates with graceful degradation** — Server-Sent Events push change notifications, with an automatic polling fallback if the stream drops.
-- **Typed, shared contract** — a single `@conduit/contracts` package is the source of truth for every DTO, enum, route, and request shape, imported by both apps.
+<table>
+  <tr>
+    <td width="33%" valign="top">
+      <h4><img src="https://api.iconify.design/lucide/fingerprint.svg?color=%236C4CF1" width="18" align="center" /> Exactly-once ingest</h4>
+      A unique <code>idempotencyKey</code> constraint makes a duplicate webhook return the original event instead of re-processing it.
+    </td>
+    <td width="33%" valign="top">
+      <h4><img src="https://api.iconify.design/lucide/database.svg?color=%236C4CF1" width="18" align="center" /> Durable before processing</h4>
+      The raw event is persisted before any work, so a mid-processing crash never loses it.
+    </td>
+    <td width="33%" valign="top">
+      <h4><img src="https://api.iconify.design/lucide/repeat.svg?color=%236C4CF1" width="18" align="center" /> Reliable delivery</h4>
+      A BullMQ-backed queue drives retries with exponential backoff + jitter and dead-letters exhausted sends.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">
+      <h4><img src="https://api.iconify.design/lucide/rotate-ccw.svg?color=%236C4CF1" width="18" align="center" /> One-click / API replay</h4>
+      Dead-lettered sends can be re-enqueued individually or in bulk — idempotently, so a double-click can't double-send.
+    </td>
+    <td valign="top">
+      <h4><img src="https://api.iconify.design/lucide/scale.svg?color=%236C4CF1" width="18" align="center" /> Continuous reconciliation</h4>
+      A background reconciler detects and persists gaps between events and their expected sends, and links each to its source.
+    </td>
+    <td valign="top">
+      <h4><img src="https://api.iconify.design/lucide/layout-dashboard.svg?color=%236C4CF1" width="18" align="center" /> Live dashboard</h4>
+      A Next.js app with a live event stream, DLQ + replay UI, and a reconciliation gap explorer.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">
+      <h4><img src="https://api.iconify.design/lucide/activity.svg?color=%236C4CF1" width="18" align="center" /> Live, with graceful degradation</h4>
+      Server-Sent Events push change notifications, with an automatic polling fallback if the stream drops.
+    </td>
+    <td valign="top">
+      <h4><img src="https://api.iconify.design/lucide/braces.svg?color=%236C4CF1" width="18" align="center" /> Typed, shared contract</h4>
+      One <code>@conduit/contracts</code> package is the source of truth for every DTO, enum, and route — imported by both apps.
+    </td>
+    <td valign="top">
+      <h4><img src="https://api.iconify.design/lucide/shield-check.svg?color=%236C4CF1" width="18" align="center" /> Signed &amp; validated</h4>
+      HMAC-verified webhooks over raw bytes, strict request validation, and a single typed error envelope everywhere.
+    </td>
+  </tr>
+</table>
 
 ## Screenshots
 
@@ -156,6 +209,7 @@ The claim isn't "trust us" — it's measurable. The test: run **N events with in
 | **Database**       | PostgreSQL 16, Prisma 7 (new `prisma-client` generator + `@prisma/adapter-pg` driver adapter) |
 | **Queue / jobs**   | Redis 7 + BullMQ 5 (`@nestjs/bullmq`)                                                         |
 | **Realtime**       | Server-Sent Events (NestJS `@Sse` + RxJS), client `EventSource` with polling fallback         |
+| **Payments**       | Monnify APIs (sandbox) — transaction, settlement, disbursement, and refund webhooks           |
 | **Email provider** | Resend (`resend` SDK)                                                                         |
 | **Validation**     | Zod 4 (env + shared request schemas), NestJS `ValidationPipe`                                 |
 | **Authentication** | HMAC-SHA256 webhook signature verification (see [Authentication Flow](#authentication-flow))  |
@@ -228,30 +282,31 @@ sequenceDiagram
   participant DB as PostgreSQL
   participant Q as BullMQ queue
   participant Wk as DeliveryProcessor
-  participant Prv as Provider SDK (Resend)
+  participant Prv as Resend provider
+  participant Str as StreamService
   participant Rec as Reconciler
 
-  Prov->>Ctl: POST /webhooks/:source (raw body + x-signature)
-  Ctl->>Svc: ingest(source, rawBody, signature)
-  Svc->>Svc: HMAC-SHA256 verify (timing-safe)
-  Svc->>DB: createIfNew(idempotencyKey UNIQUE)
+  Prov->>Ctl: POST /webhooks/:source, raw body + x-signature
+  Ctl->>Svc: ingest source, rawBody, signature
+  Svc->>Svc: HMAC-SHA256 verify, timing-safe
+  Svc->>DB: createIfNew on unique idempotencyKey
   alt duplicate key
-    DB-->>Svc: existing event (duplicate = true)
-    Svc-->>Ctl: { id, duplicate: true }  // no re-processing
+    DB-->>Svc: existing event, duplicate=true
+    Svc-->>Ctl: return id, no re-processing
   else new event
-    DB-->>Svc: new event (duplicate = false)
-    Svc->>Q: add "deliver" { eventId }
-    Svc-->>Ctl: { id, duplicate: false }
-    Q->>Wk: process(job)
-    Wk->>DB: create Send (causedBy = eventId)
-    Wk->>Prv: send(...)
-    Prv-->>Wk: result (status / error)
-    Wk->>DB: record Attempt; on exhaustion → status = dead_lettered
-    Wk-->>Stream: publish send.updated
+    DB-->>Svc: new event, duplicate=false
+    Svc->>Q: add deliver job, eventId
+    Svc-->>Ctl: return id
+    Q->>Wk: process job
+    Wk->>DB: create Send, causedBy=eventId
+    Wk->>Prv: send
+    Prv-->>Wk: result, status or error
+    Wk->>DB: record Attempt, dead_letter on exhaustion
+    Wk-->>Str: publish send.updated
   end
-  Rec->>DB: scan invariant (processed events vs terminal sends)
-  Rec->>DB: persist new gaps (idempotent)
-  Rec-->>Stream: publish gap.detected
+  Rec->>DB: scan invariant, processed vs terminal sends
+  Rec->>DB: persist new gaps, idempotent
+  Rec-->>Str: publish gap.detected
 ```
 
 ### API request pipeline
@@ -275,14 +330,14 @@ The stream is deliberately "dumb": it broadcasts _that_ something changed, not t
 sequenceDiagram
   participant API as StreamService
   participant SSE as GET /stream
-  participant Cli as useConduitStream (client)
+  participant Cli as useConduitStream
   participant QC as TanStack Query
 
-  API-->>SSE: StreamEvent { kind }
+  API-->>SSE: StreamEvent with a kind
   SSE-->>Cli: EventSource message
-  Cli->>QC: invalidate keys for that kind (events / sends / reconcile / stats)
+  Cli->>QC: invalidate keys for that kind
   QC-->>Cli: refetch affected queries
-  Note over Cli: if the stream drops for a grace period,<br/>fall back to polling every ~3s until it reconnects
+  Note over Cli: if the stream drops, poll every ~3s until it reconnects
 ```
 
 ### Data flow & the `causedBy` thread
@@ -319,6 +374,81 @@ sequenceDiagram
 3. **Deliver.** The delivery worker creates `Send` rows (linked by `causedBy`), delivers via the provider, records each `Attempt`, retries with exponential backoff + jitter, and dead-letters after the max attempts.
 4. **Reconcile.** A background reconciler checks the invariant and persists any newly-detected gaps, idempotently (an open gap for the same `(type, event, send)` is not re-emitted).
 5. **Observe.** The dashboard reads events, sends, gaps, and stats over REST, and subscribes to `/stream` (SSE) to refetch on change — falling back to polling if the stream drops.
+
+---
+
+## Monnify Integration
+
+Conduit models **Monnify as a first-class webhook source**. Monnify posts transaction notifications to a single endpoint, and Conduit gives those notifications the reliability guarantees payments demand.
+
+**Endpoint.** Point your Monnify (sandbox) webhook URL at:
+
+```
+POST /webhooks/monnify
+```
+
+**Event types.** Conduit ingests Monnify's transaction events — `SUCCESSFUL_TRANSACTION`, `SETTLEMENT`, `SUCCESSFUL_DISBURSEMENT`, `FAILED_DISBURSEMENT`, `REFUND_COMPLETED` — recording each as a `WebhookEvent` whose `type` is the Monnify `eventType`.
+
+**Idempotency.** Monnify's `transactionReference` is unique per transaction, which makes it the natural idempotency key — so a retried notification returns the original event instead of crediting a wallet or emailing a receipt twice.
+
+**The flow, applied to Monnify:**
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant M as Monnify
+  participant C as Conduit /webhooks/monnify
+  participant DB as PostgreSQL
+  participant W as Delivery worker
+  participant Cust as Customer
+  participant R as Reconciler
+
+  M->>C: SUCCESSFUL_TRANSACTION, monnify-signature
+  C->>C: verify HMAC over raw body
+  C->>DB: persist event, dedupe on transactionReference
+  C-->>M: 200 OK, fast ack
+  C->>W: enqueue receipt delivery
+  W->>Cust: send receipt, retries + DLQ
+  W->>DB: record attempts and final status
+  R->>DB: every SUCCESSFUL_TRANSACTION has a delivered receipt?
+  R->>DB: flag no_send / duplicate_send / stuck, linked to the transaction
+```
+
+**Sample Monnify webhook → `WebhookEvent`.** A Monnify transaction notification maps onto Conduit's contract like this:
+
+```jsonc
+// Monnify posts (shape simplified):
+{
+  "eventType": "SUCCESSFUL_TRANSACTION",
+  "eventData": {
+    "transactionReference": "MNFY|20260719|0001",
+    "paymentReference": "order_4821",
+    "amountPaid": "4200.00",
+    "paidOn": "2026-07-19T12:00:00Z",
+    "customer": { "email": "ada@example.com" },
+  },
+}
+```
+
+```jsonc
+// Conduit stores it as a WebhookEvent:
+{
+  "id": "3f2c…", // internal uuid
+  "source": "monnify",
+  "type": "SUCCESSFUL_TRANSACTION", // ← eventType
+  "idempotencyKey": "MNFY|20260719|0001", // ← eventData.transactionReference (unique)
+  "status": "received",
+  "payload": {/* the full raw Monnify body */},
+  "receivedAt": "2026-07-19T12:00:00.100Z",
+  "processedAt": null,
+}
+```
+
+The resulting receipt is a `Send` with `causedBy` set to this event's `id`, so the reconciler can later prove the payment produced exactly one delivered receipt.
+
+**Configuration.** Set `WEBHOOK_SECRET_MONNIFY` to your Monnify client secret and run against the Monnify **sandbox** while testing.
+
+> **Integration status (honest):** the webhook handler is **source-generic** — it verifies an HMAC over the raw bytes and extracts the idempotency key from the payload, so `monnify` works as a source today. Monnify's exact scheme (a **SHA-512** HMAC in the `monnify-signature` header, and mapping `eventData.transactionReference` → idempotency key) is the per-source adaptation, tracked in [Implementation Status](#implementation-status). Nothing here claims a live Monnify call that isn't in the code.
 
 ---
 
@@ -363,7 +493,7 @@ conduit/
 │           ├── stores/              # Zustand: filters, selection, toast, stream
 │           └── mocks/               # API-shaped fixtures + adapter (mock mode)
 ├── packages/
-│   ├── contracts/                  # ★ shared DTOs, enums, zod schemas, routes, SSE contract
+│   ├── contracts/                  # shared DTOs, enums, zod schemas, routes, SSE contract (source of truth)
 │   ├── tsconfig/                   # shared TS base configs
 │   └── eslint-config/              # shared ESLint config
 ├── docker-compose.yml              # local Postgres (5435) + Redis (6380)
@@ -392,17 +522,17 @@ Copy the example and fill in secrets:
 cp .env.example .env
 ```
 
-| Variable                  | Scope | Description                                                                                                                                 |
-| ------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `DATABASE_URL`            | API   | PostgreSQL connection string. Defaults point at the Docker service on host port **5435**.                                                   |
-| `REDIS_URL`               | API   | Redis connection string. Defaults to the Docker service on host port **6380**.                                                              |
-| `API_PORT`                | API   | Port the NestJS API listens on (default `3001`).                                                                                            |
-| `WEB_ORIGIN`              | API   | Allowed CORS origin (default `http://localhost:3000`).                                                                                      |
-| `RESEND_API_KEY`          | API   | Resend API key for email delivery. Optional in dev (a stub key is used).                                                                    |
-| `EMAIL_FROM`              | API   | From-address for outbound email.                                                                                                            |
-| `WEBHOOK_SECRET_<SOURCE>` | API   | Per-source HMAC secret, e.g. `WEBHOOK_SECRET_STRIPE`. If unset for a source, signature verification is **skipped in dev** (with a warning). |
-| `NEXT_PUBLIC_API_URL`     | Web   | Base URL of the API (exposed to the browser).                                                                                               |
-| `NEXT_PUBLIC_USE_MOCKS`   | Web   | `true` renders every view against in-memory fixtures; `false` hits the live API.                                                            |
+| Variable                  | Scope | Description                                                                                                                                                               |
+| ------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`            | API   | PostgreSQL connection string. Defaults point at the Docker service on host port **5435**.                                                                                 |
+| `REDIS_URL`               | API   | Redis connection string. Defaults to the Docker service on host port **6380**.                                                                                            |
+| `API_PORT`                | API   | Port the NestJS API listens on (default `3001`).                                                                                                                          |
+| `WEB_ORIGIN`              | API   | Allowed CORS origin (default `http://localhost:3000`).                                                                                                                    |
+| `RESEND_API_KEY`          | API   | Resend API key for email delivery. Optional in dev (a stub key is used).                                                                                                  |
+| `EMAIL_FROM`              | API   | From-address for outbound email.                                                                                                                                          |
+| `WEBHOOK_SECRET_<SOURCE>` | API   | Per-source HMAC secret, e.g. `WEBHOOK_SECRET_MONNIFY` (your Monnify client secret). If unset for a source, signature verification is **skipped in dev** (with a warning). |
+| `NEXT_PUBLIC_API_URL`     | Web   | Base URL of the API (exposed to the browser).                                                                                                                             |
+| `NEXT_PUBLIC_USE_MOCKS`   | Web   | `true` renders every view against in-memory fixtures; `false` hits the live API.                                                                                          |
 
 > The API validates its environment at boot with Zod (`apps/api/src/config/env.schema.ts`) — an invalid or missing required variable fails fast with a clear message.
 
@@ -709,7 +839,7 @@ Conduit is a working scaffold with the full contract, schema, and every module a
 - **Resend provider** — returns a stubbed `202` instead of performing a live send.
 - **Reconciler scheduling** — `runReconciler()` is implemented but not yet wired to a periodic schedule; `orphan_send` detection is pending.
 - **`duplicatesRejected` stat** — currently returns `0` (duplicates aren't yet counted in a metric).
-- **Hardened per-source HMAC schemes** — beyond the generic HMAC-SHA256 verification.
+- **Hardened per-source HMAC schemes** — beyond the generic HMAC-SHA256 verification, including **Monnify's SHA-512 `monnify-signature`** scheme and mapping `eventData.transactionReference` → idempotency key.
 
 This section is deliberately explicit so reviewers know exactly what is live versus stubbed.
 
@@ -733,7 +863,7 @@ This section is deliberately explicit so reviewers know exactly what is live ver
 
 ## Contributors
 
-Built by a team of four across two days, each owning a vertical slice of the pipe:
+Built for the [APIConf 2026 Lagos Developer Challenge](https://apiconf.net/hackathon) by a team of four, each owning a vertical slice of the pipe:
 
 | Role    | GitHub                                           | Area                                            |
 | ------- | ------------------------------------------------ | ----------------------------------------------- |
@@ -748,4 +878,4 @@ No `LICENSE` file is present in the repository yet. _(Placeholder — add a lice
 
 ## Acknowledgements
 
-Built with [NestJS](https://nestjs.com), [Next.js](https://nextjs.org), [Prisma](https://www.prisma.io), [BullMQ](https://docs.bullmq.io), [TanStack Query](https://tanstack.com/query), [Zustand](https://zustand-demo.pmnd.rs), [Tailwind CSS](https://tailwindcss.com), [Resend](https://resend.com), and [Turborepo](https://turbo.build).
+Built for the **[APIConf 2026 Lagos](https://apiconf.net) Developer Challenge** with [Monnify](https://monnify.com). Powered by [NestJS](https://nestjs.com), [Next.js](https://nextjs.org), [Prisma](https://www.prisma.io), [BullMQ](https://docs.bullmq.io), [TanStack Query](https://tanstack.com/query), [Zustand](https://zustand-demo.pmnd.rs), [Tailwind CSS](https://tailwindcss.com), [Resend](https://resend.com), and [Turborepo](https://turbo.build).
