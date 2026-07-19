@@ -1,5 +1,5 @@
-import type { GapType, ReconcileReportDto } from '@conduit/contracts';
-import { mockEventDetail, mockEvents, mockReport, mockSends, mockStats } from './fixtures';
+import type { EventDto, GapType, Paginated, ReconcileReportDto } from '@conduit/contracts';
+import { eventList, mockEventDetail, mockReport, mockSends, mockStats } from './fixtures';
 
 export function isMockMode(): boolean {
   return process.env.NEXT_PUBLIC_USE_MOCKS === 'true';
@@ -27,6 +27,34 @@ function reportInWindow(from: string | null, to: string | null): ReconcileReport
   return { ...mockReport, gaps, summary, invariantHolds: gaps.length === 0 };
 }
 
+/** Slice an already-filtered list into a cursor page, mirroring the real API. */
+function paginate<T>(items: T[], params: URLSearchParams): Paginated<T> {
+  const limit = Number(params.get('limit') ?? '20');
+  const start = Number(params.get('cursor') ?? '0');
+  const page = items.slice(start, start + limit);
+  const nextStart = start + limit;
+  return {
+    items: page,
+    nextCursor: nextStart < items.length ? String(nextStart) : null,
+    total: items.length,
+  };
+}
+
+/** Apply the /events query filters (status, source, time window). */
+function filterEvents(params: URLSearchParams): EventDto[] {
+  const status = params.get('status');
+  const source = params.get('source');
+  const from = params.get('from');
+  const to = params.get('to');
+  return eventList.filter((e) => {
+    if (status && e.status !== status) return false;
+    if (source && !e.source.toLowerCase().includes(source.toLowerCase())) return false;
+    if (from && Date.parse(e.receivedAt) < Date.parse(from)) return false;
+    if (to && Date.parse(e.receivedAt) > Date.parse(to)) return false;
+    return true;
+  });
+}
+
 // Session-local state so replay behaves believably: a replayed send leaves the
 // DLQ and stays gone across refetches, exactly as the real API would report it.
 const replayed = new Set<string>();
@@ -37,7 +65,10 @@ export function mockResolve<T>(path: string, init?: RequestInit): Promise<T> {
 
   const eventDetail = rawPath.match(/^\/events\/([^/]+)$/);
   if (eventDetail) return Promise.resolve(mockEventDetail(eventDetail[1]) as T);
-  if (rawPath === '/events') return Promise.resolve(mockEvents as T);
+  if (rawPath === '/events') {
+    const params = new URLSearchParams(path.split('?')[1] ?? '');
+    return Promise.resolve(paginate(filterEvents(params), params) as T);
+  }
 
   const replay = rawPath.match(/^\/sends\/([^/]+)\/replay$/);
   if (replay && init?.method === 'POST') {
@@ -49,12 +80,7 @@ export function mockResolve<T>(path: string, init?: RequestInit): Promise<T> {
   if (rawPath === '/sends') {
     const params = new URLSearchParams(path.split('?')[1] ?? '');
     const all = mockSends.items.filter((s) => !replayed.has(s.id));
-    const limit = Number(params.get('limit') ?? '20');
-    const start = Number(params.get('cursor') ?? '0');
-    const page = all.slice(start, start + limit);
-    const nextStart = start + limit;
-    const nextCursor = nextStart < all.length ? String(nextStart) : null;
-    return Promise.resolve({ items: page, nextCursor, total: all.length } as T);
+    return Promise.resolve(paginate(all, params) as T);
   }
 
   if (rawPath === '/reconcile') {

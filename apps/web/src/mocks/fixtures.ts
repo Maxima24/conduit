@@ -50,35 +50,78 @@ const sendsWithAttempts: SendWithAttemptsDto[] = [
   },
 ];
 
+// Ordered newest-first, as the events list is served.
+export const eventList: EventDto[] = [
+  {
+    id: 'evt_1',
+    source: 'stripe',
+    type: 'payment_intent.succeeded',
+    idempotencyKey: 'evt_stripe_001',
+    status: 'processed',
+    payload: { amount: 4200, currency: 'usd' },
+    receivedAt: now,
+    processedAt: '2026-07-19T12:00:01.000Z',
+  },
+  {
+    id: 'evt_2',
+    source: 'github',
+    type: 'push',
+    idempotencyKey: 'evt_github_002',
+    status: 'failed',
+    payload: { ref: 'refs/heads/main' },
+    receivedAt: '2026-07-19T11:58:00.000Z',
+    processedAt: null,
+  },
+  {
+    id: 'evt_3',
+    source: 'stripe',
+    type: 'charge.refunded',
+    idempotencyKey: 'evt_stripe_003',
+    status: 'processed',
+    payload: { amount: 1500, currency: 'usd' },
+    receivedAt: '2026-07-19T11:45:00.000Z',
+    processedAt: '2026-07-19T11:45:02.000Z',
+  },
+  {
+    id: 'evt_4',
+    source: 'shopify',
+    type: 'orders/create',
+    idempotencyKey: 'evt_shopify_004',
+    status: 'processing',
+    payload: { orderId: 'A1043', total: 89.9 },
+    receivedAt: '2026-07-19T11:30:00.000Z',
+    processedAt: null,
+  },
+  {
+    id: 'evt_5',
+    source: 'github',
+    type: 'pull_request.opened',
+    idempotencyKey: 'evt_github_005',
+    status: 'processed',
+    payload: { number: 218 },
+    receivedAt: '2026-07-19T10:15:00.000Z',
+    processedAt: '2026-07-19T10:15:01.000Z',
+  },
+  {
+    id: 'evt_6',
+    source: 'stripe',
+    type: 'invoice.payment_failed',
+    idempotencyKey: 'evt_stripe_006',
+    status: 'received',
+    payload: { invoice: 'in_88231' },
+    receivedAt: '2026-07-19T09:05:00.000Z',
+    processedAt: null,
+  },
+];
+
 export const mockEvents: Paginated<EventDto> = {
-  items: [
-    {
-      id: 'evt_1',
-      source: 'stripe',
-      type: 'payment_intent.succeeded',
-      idempotencyKey: 'evt_stripe_001',
-      status: 'processed',
-      payload: { amount: 4200, currency: 'usd' },
-      receivedAt: now,
-      processedAt: '2026-07-19T12:00:01.000Z',
-    },
-    {
-      id: 'evt_2',
-      source: 'github',
-      type: 'push',
-      idempotencyKey: 'evt_github_002',
-      status: 'failed',
-      payload: { ref: 'refs/heads/main' },
-      receivedAt: '2026-07-19T11:58:00.000Z',
-      processedAt: null,
-    },
-  ],
+  items: eventList,
   nextCursor: null,
-  total: 2,
+  total: eventList.length,
 };
 
 export function mockEventDetail(id: string): EventDetailDto {
-  const base = mockEvents.items.find((e) => e.id === id) ?? mockEvents.items[0];
+  const base = eventList.find((e) => e.id === id) ?? eventList[0];
   return { ...base, id, sends: sendsWithAttempts };
 }
 

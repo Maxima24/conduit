@@ -6,6 +6,7 @@ export const queryKeys = {
   events: {
     all: ['events'] as const,
     list: (f: EventFilters) => [...queryKeys.events.all, 'list', f] as const,
+    infinite: (f: EventFilters) => [...queryKeys.events.all, 'infinite', f] as const,
     detail: (id: string) => [...queryKeys.events.all, 'detail', id] as const,
   },
   sends: {
