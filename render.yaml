@@ -1,0 +1,39 @@
+# Render staging (free tier). Frontend deploys to Vercel separately (see README).
+# Caveats: free services sleep after inactivity (cold start ~30s — warm before a demo);
+# the BullMQ worker runs in-process with the API at this stage; SSE relies on the 15s
+# heartbeat + polling fallback through the proxy.
+services:
+  - type: web
+    name: conduit-api
+    runtime: node
+    plan: free
+    buildCommand: pnpm install && pnpm turbo run build --filter=@conduit/api && pnpm --filter @conduit/api db:generate
+    startCommand: pnpm --filter @conduit/api db:migrate:deploy && pnpm --filter @conduit/api start:prod
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: conduit-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: conduit-redis
+          type: redis
+          property: connectionString
+      - key: WEB_ORIGIN
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+
+  - type: redis
+    name: conduit-redis
+    plan: free
+    ipAllowList: []
+
+databases:
+  - name: conduit-db
+    plan: free

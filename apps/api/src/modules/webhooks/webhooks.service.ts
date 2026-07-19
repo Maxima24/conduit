@@ -1,0 +1,115 @@
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { InjectQueue } from '@nestjs/bullmq';
+import type { Queue } from 'bullmq';
+import { createHmac, timingSafeEqual } from 'node:crypto';
+import type { WebhookIngestResponse } from '@conduit/contracts';
+import { AppConfigService } from '../../config/config.service';
+import { QUEUE_NAMES } from '../../queue/queue.constants';
+import { DELIVERY_JOB_NAME, type DeliveryJobData } from '../../queue/job.types';
+import { WebhooksRepository } from './webhooks.repository';
+
+@Injectable()
+export class WebhooksService {
+  private readonly logger = new Logger(WebhooksService.name);
+
+  constructor(
+    private readonly repo: WebhooksRepository,
+    private readonly config: AppConfigService,
+    @InjectQueue(QUEUE_NAMES.delivery) private readonly deliveryQueue: Queue<DeliveryJobData>,
+  ) {}
+
+  async ingest(
+    source: string,
+    rawBody: Buffer,
+    signature?: string,
+  ): Promise<WebhookIngestResponse> {
+    this.verifySignature(source, rawBody, signature);
+
+    const parsed = this.parse(rawBody);
+    const { event, duplicate } = await this.repo.createIfNew({
+      source,
+      type: parsed.type,
+      idempotencyKey: parsed.idempotencyKey,
+      payload: parsed.payload,
+      signature: signature ?? null,
+    });
+
+    // Hand off to BE2's delivery worker only for genuinely new events.
+    if (!duplicate) {
+      await this.deliveryQueue.add(
+        DELIVERY_JOB_NAME,
+        { eventId: event.id },
+        { removeOnComplete: true, removeOnFail: false },
+      );
+    }
+
+    return { id: event.id, duplicate };
+  }
+
+  /**
+   * HMAC-SHA256 over the exact raw bytes. Dev fallback: if no per-source secret is
+   * configured, the check is skipped (with a warning).
+   *
+   * TODO(BE1 · P0): harden — per-source secret management + source-specific signature
+   * schemes (e.g. Stripe's `t=...,v1=...`).
+   */
+  private verifySignature(source: string, rawBody: Buffer, signature?: string): void {
+    const secret = this.config.webhookSecret(source);
+    if (!secret) {
+      this.logger.warn(
+        `No WEBHOOK_SECRET_${source.toUpperCase()} configured; skipping signature check.`,
+      );
+      return;
+    }
+    if (!signature) {
+      throw new UnauthorizedException({
+        code: 'INVALID_SIGNATURE',
+        message: 'Missing signature header',
+      });
+    }
+    const expected = createHmac('sha256', secret).update(rawBody).digest('hex');
+    const a = Buffer.from(expected);
+    const b = Buffer.from(signature);
+    if (a.length !== b.length || !timingSafeEqual(a, b)) {
+      throw new UnauthorizedException({
+        code: 'INVALID_SIGNATURE',
+        message: 'Invalid signature',
+      });
+    }
+  }
+
+  private parse(rawBody: Buffer): {
+    type: string;
+    idempotencyKey: string;
+    payload: Record<string, unknown>;
+  } {
+    let json: Record<string, unknown>;
+    try {
+      json = JSON.parse(rawBody.toString('utf8')) as Record<string, unknown>;
+    } catch {
+      throw new BadRequestException({
+        code: 'INVALID_PAYLOAD',
+        message: 'Body is not valid JSON',
+      });
+    }
+    const type = typeof json.type === 'string' ? json.type : 'unknown';
+    const idempotencyKey =
+      typeof json.idempotencyKey === 'string'
+        ? json.idempotencyKey
+        : typeof json.id === 'string'
+          ? json.id
+          : undefined;
+    if (!idempotencyKey) {
+      throw new BadRequestException({
+        code: 'MISSING_IDEMPOTENCY_KEY',
+        message: 'Payload must include an idempotencyKey or id',
+      });
+    }
+    return { type, idempotencyKey, payload: json };
+  }
+}

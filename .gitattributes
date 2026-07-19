@@ -1,0 +1,14 @@
+# Normalize line endings to LF across the team (host is Windows).
+* text=auto eol=lf
+
+# Binary assets — never touch line endings.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+
+# Lockfile is generated — collapse in diffs.
+pnpm-lock.yaml linguist-generated=true

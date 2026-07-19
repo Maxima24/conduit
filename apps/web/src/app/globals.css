@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+/* Tailwind v4 CSS-first theme tokens. */
+@theme {
+  --color-bg: #0b0e14;
+  --color-surface: #131722;
+  --color-border: #232a39;
+  --color-muted: #8b97ad;
+  --color-text: #e7ecf3;
+  --color-accent: #5b8cff;
+}
+
+:root {
+  color-scheme: dark;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+body {
+  min-height: 100dvh;
+}

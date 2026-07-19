@@ -1,0 +1,84 @@
+// Prisma 7 — uses the new `prisma-client` generator (not the deprecated
+// `prisma-client-js`). Generated client is TS source at src/generated/prisma
+// (gitignored, regenerated via `pnpm db:generate`), imported from the `/client` subpath.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  runtime      = "nodejs"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+  // Prisma 7: the connection URL lives in prisma.config.ts (for Migrate) and is passed
+  // to PrismaClient via a driver adapter at runtime — it is no longer set here.
+}
+
+model WebhookEvent {
+  id             String         @id @default(uuid())
+  source         String
+  type           String
+  idempotencyKey String         @unique // ← the correctness guarantee
+  status         String         @default("received")
+  payload        Json
+  signature      String?
+  receivedAt     DateTime       @default(now())
+  processedAt    DateTime?
+  sends          Send[]
+  gaps           ReconcileGap[]
+
+  @@index([status, receivedAt])
+  @@index([source, receivedAt])
+  @@map("webhook_events")
+}
+
+model Send {
+  id             String         @id @default(uuid())
+  causedBy       String
+  event          WebhookEvent   @relation(fields: [causedBy], references: [id], onDelete: Cascade)
+  channel        String
+  to             String
+  payload        Json
+  status         String         @default("pending")
+  attempts       Int            @default(0)
+  lastError      String?
+  createdAt      DateTime       @default(now())
+  deliveredAt    DateTime?
+  attemptHistory Attempt[]
+  gaps           ReconcileGap[]
+
+  @@index([status, createdAt])
+  @@index([causedBy])
+  @@map("sends")
+}
+
+model Attempt {
+  id          String    @id @default(uuid())
+  sendId      String
+  send        Send      @relation(fields: [sendId], references: [id], onDelete: Cascade)
+  attemptNo   Int
+  statusCode  Int?
+  error       String?
+  durationMs  Int
+  at          DateTime  @default(now())
+  nextRetryAt DateTime?
+
+  @@unique([sendId, attemptNo])
+  @@map("attempts")
+}
+
+model ReconcileGap {
+  id         String        @id @default(uuid())
+  type       String
+  eventId    String?
+  event      WebhookEvent? @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  sendId     String?
+  send       Send?         @relation(fields: [sendId], references: [id], onDelete: SetNull)
+  detail     String
+  detectedAt DateTime      @default(now())
+  resolvedAt DateTime?
+
+  @@index([type, detectedAt])
+  @@map("reconcile_gaps")
+}
