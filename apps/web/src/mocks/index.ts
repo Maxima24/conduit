@@ -1,4 +1,4 @@
-import type { EventDto, GapType, Paginated, ReconcileReportDto } from '@conduit/contracts';
+import type { EventDto, GapSummary, Paginated, ReconcileReportDto } from '@conduit/contracts';
 import { eventList, mockEventDetail, mockReport, mockSends, mockStats } from './fixtures';
 
 export function isMockMode(): boolean {
@@ -16,12 +16,15 @@ function reportInWindow(from: string | null, to: string | null): ReconcileReport
     return at >= fromMs && at <= toMs;
   });
 
-  const summary = gaps.reduce(
-    (acc, g) => ({ ...acc, [g.type]: acc[g.type] + 1, total: acc.total + 1 }),
-    { no_send: 0, orphan_send: 0, duplicate_send: 0, stuck: 0, total: 0 } as Record<
-      GapType,
-      number
-    > & { total: number },
+  const summary = gaps.reduce<GapSummary>(
+    (acc, g) => ({
+      ...acc,
+      [g.type]: acc[g.type] + 1,
+      total: acc.total + 1,
+      open: acc.open + (g.resolvedAt === null ? 1 : 0),
+      resolved: acc.resolved + (g.resolvedAt === null ? 0 : 1),
+    }),
+    { no_send: 0, orphan_send: 0, duplicate_send: 0, stuck: 0, total: 0, open: 0, resolved: 0 },
   );
 
   return { ...mockReport, gaps, summary, invariantHolds: gaps.length === 0 };
