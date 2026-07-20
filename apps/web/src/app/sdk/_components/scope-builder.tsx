@@ -1,8 +1,13 @@
 'use client';
 
-import { Building2, Code2, KeyRound, Layers3, ShieldCheck, Unplug, UserRound, Users } from 'lucide-react';
+import { useRef } from 'react';
+import { useGSAP } from '@gsap/react';
+import { gsap } from 'gsap';
+import { Unplug } from 'lucide-react';
 import type { AccessEntity } from './access-data';
 import { SectionHeading } from './capability-surface';
+
+gsap.registerPlugin(useGSAP);
 
 type ScopeBuilderProps = {
   entities: AccessEntity[];
@@ -14,22 +19,33 @@ type ScopeBuilderProps = {
 };
 
 const LEVELS = [
-  { id: 'organization', label: 'Organization', value: 'Conduit Inc.', icon: Building2 },
-  { id: 'workspace', label: 'Workspace', value: 'Production', icon: Layers3 },
-  { id: 'team', label: 'Access entity', value: '', icon: Users },
-  { id: 'developer', label: 'Developer', value: 'SDK consumer', icon: UserRound },
-  { id: 'key', label: 'Credential', value: '', icon: KeyRound },
-  { id: 'permissions', label: 'Permission set', value: '', icon: ShieldCheck },
+  { id: 'organization', label: 'Organization', value: 'Conduit Inc.' },
+  { id: 'workspace', label: 'Workspace', value: 'Production' },
+  { id: 'team', label: 'Access entity', value: '' },
+  { id: 'developer', label: 'Consumer', value: 'SDK runtime' },
+  { id: 'key', label: 'Credential', value: '' },
+  { id: 'permissions', label: 'Permission set', value: '' },
 ];
 
 export function ScopeBuilder(props: ScopeBuilderProps) {
   const { entities, focusedEntity, effectiveCount, connected, onFocus, onConnectionChange } = props;
+  const rootRef = useRef<HTMLElement>(null);
   const keyEntity = focusedEntity.type === 'key'
     ? focusedEntity
     : entities.find((entity) => entity.type === 'key') ?? focusedEntity;
 
+  useGSAP(
+    () => {
+      const timeline = gsap.timeline({ defaults: { ease: 'power3.out' } });
+      timeline
+        .from('[data-path-stage]', { x: -7, opacity: 0.84, duration: 0.42, stagger: 0.055 })
+        .fromTo('[data-path-link]', { scaleX: 0, transformOrigin: 'left center' }, { scaleX: 1, duration: 0.32, stagger: 0.04 }, '-=0.3');
+    },
+    { scope: rootRef },
+  );
+
   return (
-    <section className="control-section">
+    <section ref={rootRef} className="control-section">
       <SectionHeading
         index="02"
         label="Scope builder"
@@ -37,69 +53,83 @@ export function ScopeBuilder(props: ScopeBuilderProps) {
         detail={connected ? 'Path verified' : 'Path interrupted'}
       />
 
-      <div className="connected-surface p-3 sm:p-5">
-        <div className="access-scroll flex min-w-0 gap-0 overflow-x-auto pb-2">
-          {LEVELS.map((level, index) => {
-            const Icon = level.icon;
-            const value = level.id === 'team'
-              ? focusedEntity.label
-              : level.id === 'key'
-                ? keyEntity.label
-                : level.id === 'permissions'
-                  ? `${effectiveCount} grants`
-                  : level.value;
-            const dimmed = !connected && index > 1;
-
-            return (
-              <div key={level.id} className="flex min-w-0 shrink-0 items-center">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (level.id === 'team') onFocus(focusedEntity.type === 'team' ? focusedEntity.id : 'team-alpha');
-                    if (level.id === 'key') onFocus(keyEntity.id);
-                  }}
-                  className={`machine-flow-node group/node relative h-[112px] w-[142px] bg-[#0c0c0c] p-3 text-left transition duration-300 sm:w-[154px] ${dimmed ? 'opacity-25' : 'hover:bg-white/[0.025]'}`}
-                >
-                  <div className="flex items-center justify-between">
-                    <Icon className={`h-4 w-4 ${dimmed ? 'text-white/20' : 'text-white/45 group-hover/node:text-emerald-300'}`} strokeWidth={1.5} />
-                    <span className="font-mono text-[8px] text-white/18">L{String(index + 1).padStart(2, '0')}</span>
-                  </div>
-                  <p className="mt-5 font-mono text-[8px] uppercase tracking-[0.18em] text-white/24">{level.label}</p>
-                  <p className="mt-1 truncate text-xs font-medium text-white/70">{value}</p>
-                  {!dimmed ? <span className="absolute bottom-0 left-0 h-px w-full origin-left bg-emerald-300/35 transition-transform duration-500 group-hover/node:scale-x-100" /> : null}
-                </button>
-
-                {index < LEVELS.length - 1 ? (
-                  <div className={`relative h-px w-10 shrink-0 bg-white/10 sm:w-12 ${!connected && index >= 1 ? 'opacity-20' : ''}`}>
-                    {connected || index === 0 ? <span className="flow-packet absolute -top-1 h-2 w-2 bg-emerald-300" /> : null}
-                  </div>
-                ) : null}
-              </div>
-            );
-          })}
+      <div className={`scope-route-machine ${connected ? 'is-connected' : 'is-interrupted'}`}>
+        <div className="scope-route-rail">
+          <span>ACCESS PATH / EFFECTIVE POLICY</span>
+          <span className={connected ? 'text-[#00ff94]/70' : 'text-red-200/65'}>
+            {connected ? 'SIGNAL CONTINUOUS' : 'SIGNAL SEVERED'}
+          </span>
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-white/[0.07] pt-3">
-          <span className="mr-2 flex items-center gap-2 font-mono text-[8px] uppercase tracking-[0.18em] text-white/24">
-            <Code2 className="h-3.5 w-3.5" /> Focus entity
-          </span>
-          {entities.map((entity) => (
-            <button
-              type="button"
-              key={entity.id}
-              onClick={() => onFocus(entity.id)}
-              className={`border px-2.5 py-1.5 font-mono text-[8px] uppercase tracking-[0.12em] transition ${focusedEntity.id === entity.id ? 'border-white/35 bg-white/[0.08] text-white' : 'border-white/[0.08] text-white/28 hover:border-white/25 hover:text-white/65'}`}
-            >
-              {entity.label}
-            </button>
-          ))}
+        <div className="access-scroll overflow-x-auto">
+          <div className="scope-route-track">
+            {LEVELS.map((level, index) => {
+              const value = level.id === 'team'
+                ? focusedEntity.label
+                : level.id === 'key'
+                  ? keyEntity.label
+                  : level.id === 'permissions'
+                    ? `${effectiveCount} grants`
+                    : level.value;
+              const dimmed = !connected && index > 1;
+              const selectable = level.id === 'team' || level.id === 'key';
+
+              return (
+                <div key={level.id} className="flex shrink-0 items-stretch">
+                  <button
+                    type="button"
+                    data-path-stage
+                    onClick={() => {
+                      if (level.id === 'team') onFocus(focusedEntity.type === 'team' ? focusedEntity.id : 'team-alpha');
+                      if (level.id === 'key') onFocus(keyEntity.id);
+                    }}
+                    className={`scope-route-stage group/stage ${dimmed ? 'is-dimmed' : ''} ${selectable ? 'is-selectable' : ''}`}
+                  >
+                    <div className="relative z-10 flex items-start justify-between font-mono text-[8px] uppercase tracking-[0.18em]">
+                      <span className="text-white/24">L{String(index + 1).padStart(2, '0')}</span>
+                      <span className={dimmed ? 'text-white/14' : 'text-[#00ff94]/62'}>{dimmed ? 'OFFLINE' : 'LINKED'}</span>
+                    </div>
+                    <span className="scope-route-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+                    <div className="relative z-10 mt-auto">
+                      <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-white/25">{level.label}</p>
+                      <p className="mt-2 max-w-[150px] truncate font-display text-base font-semibold text-white/76">{value}</p>
+                      {selectable ? <p className="mt-3 font-mono text-[7px] uppercase tracking-[0.15em] text-white/20 group-hover/stage:text-[#00ff94]/62">Select context</p> : null}
+                    </div>
+                  </button>
+
+                  {index < LEVELS.length - 1 ? (
+                    <div data-path-link className={`scope-route-link ${!connected && index >= 1 ? 'is-broken' : ''}`}>
+                      {(connected || index === 0) ? <span className="scope-route-packet" /> : <span className="scope-route-break">X</span>}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="scope-route-controls">
+          <div className="scope-entity-selector access-scroll">
+            <span className="scope-control-label">Context</span>
+            {entities.map((entity) => (
+              <button
+                type="button"
+                key={entity.id}
+                onClick={() => onFocus(entity.id)}
+                className={`scope-entity-option ${focusedEntity.id === entity.id ? 'is-active' : ''}`}
+              >
+                <span>{entity.type}</span>
+                <strong>{entity.label}</strong>
+              </button>
+            ))}
+          </div>
 
           <button
             type="button"
             onClick={() => onConnectionChange(!connected)}
-            className={`ml-auto flex items-center gap-2 border px-3 py-2 font-mono text-[8px] uppercase tracking-[0.14em] transition ${connected ? 'border-emerald-400/30 bg-emerald-400/[0.07] text-emerald-200/70 hover:border-red-400/30 hover:text-red-200' : 'border-red-400/30 bg-red-400/[0.07] text-red-200/70 hover:border-emerald-400/35 hover:text-emerald-200'}`}
+            className={`scope-path-command ${connected ? 'is-connected' : 'is-interrupted'}`}
           >
-            <Unplug className="h-3.5 w-3.5" /> {connected ? 'Disconnect path' : 'Restore path'}
+            <Unplug className="h-3.5 w-3.5" /> {connected ? 'Interrupt path' : 'Restore path'}
           </button>
         </div>
       </div>

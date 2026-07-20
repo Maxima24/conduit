@@ -197,7 +197,7 @@ export function ScopeManager() {
 
   return (
     <main ref={rootRef} className="flex min-h-[calc(100dvh-48px)] w-full min-w-0 max-w-full flex-col overflow-x-hidden sm:min-h-[calc(100dvh-26px)] xl:h-[calc(100dvh-26px)] xl:overflow-hidden">
-      <header className="command-chassis relative z-20 shrink-0 bg-[#080808]/94 backdrop-blur-xl">
+      <header className="command-chassis relative z-20 shrink-0 bg-[#080808]">
         <div data-command-head className="flex min-h-[108px] flex-wrap items-center gap-5 px-4 py-4 sm:px-5 lg:px-7">
           <div className="mobile-command-copy w-full min-w-0 sm:w-auto">
             <h1 className="font-mono text-[10px] font-medium uppercase tracking-[0.42em] text-white/48 sm:text-[11px]">SDK Access Surface</h1>
@@ -220,14 +220,14 @@ export function ScopeManager() {
           <Metric label="Entity" value={focused.label} />
           <Metric label="Capabilities" value={`${unionCount} / 18`} strong />
           <Metric label="Last saved" value={lastSaved} />
-          <span className="ml-auto hidden items-center gap-2 whitespace-nowrap text-emerald-300/55 lg:flex"><span className="live-dot h-1.5 w-1.5 bg-emerald-400" /> Policy engine online</span>
+          <span className="ml-auto hidden items-center gap-2 whitespace-nowrap text-[#00ff94]/55 lg:flex"><span className="live-dot h-1.5 w-1.5 bg-[#00ff94]" /> Policy engine online</span>
         </div>
       </header>
 
       <div className="relative flex w-full min-h-0 min-w-0 flex-1 flex-col xl:flex-row">
         {lastChanged ? (
           <div className="permission-signal-track pointer-events-none absolute left-[12%] right-[3%] top-0 z-40 hidden h-px overflow-hidden xl:block">
-            <span data-permission-signal className="absolute -top-[2px] h-[5px] w-24 bg-emerald-300 shadow-[0_0_18px_rgba(110,231,183,.72)]" />
+            <span data-permission-signal className="absolute -top-px h-[3px] w-24 bg-[#00ff94]" />
           </div>
         ) : null}
         <div
@@ -272,7 +272,7 @@ export function ScopeManager() {
       </div>
 
       {notice ? (
-        <div className="fixed bottom-20 left-1/2 z-[100] -translate-x-1/2 border border-emerald-400/30 bg-[#0b0b0b]/95 px-4 py-2.5 font-mono text-[9px] uppercase tracking-[0.14em] text-emerald-200 shadow-[0_18px_60px_rgba(0,0,0,.55)] backdrop-blur-xl sm:bottom-6">
+        <div className="fixed bottom-20 left-1/2 z-[100] -translate-x-1/2 border border-[#00ff94]/30 bg-[#0b0b0b] px-4 py-2.5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#00ff94]/75 sm:bottom-6">
           {notice}
         </div>
       ) : null}
@@ -298,7 +298,7 @@ function Metric({ label, value, strong = false }: { label: string; value: string
 
 function CriticalGrantModal({ scopeId, count, onCancel, onConfirm }: { scopeId: string; count: number; onCancel: () => void; onConfirm: () => void }) {
   return (
-    <div className="fixed inset-0 z-[110] grid place-items-center bg-black/80 p-4 backdrop-blur-md" onMouseDown={onCancel}>
+    <div className="fixed inset-0 z-[110] grid place-items-center bg-black/80 p-4" onMouseDown={onCancel}>
       <div className="vault-panel w-full max-w-lg bg-[#0c0c0c] p-5 sm:p-6" onMouseDown={(event) => event.stopPropagation()}>
         <ShieldAlert className="h-8 w-8 text-red-300" strokeWidth={1.4} />
         <p className="mt-5 font-mono text-[8px] uppercase tracking-[0.24em] text-red-300/65">Critical permission</p>

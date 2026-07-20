@@ -25,7 +25,7 @@ function ConduitMark() {
         <path d="M25 8h11v28H25v-5h6V13h-6z" fill="currentColor" />
         <path d="M18 19h8v6h-8z" fill="currentColor" />
       </svg>
-      <span className="absolute bottom-1.5 right-1.5 h-1.5 w-1.5 bg-emerald-500" />
+      <span className="absolute bottom-1.5 right-1.5 h-1.5 w-1.5 bg-[#00ff94]" />
     </span>
   );
 }
@@ -117,7 +117,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-white/60">Conduit</span>
             </div>
             <span className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.2em] text-white/35">
-              <Activity className="h-3.5 w-3.5 text-emerald-400" /> Operational
+              <Activity className="h-3.5 w-3.5 text-[#00ff94]" /> Operational
             </span>
           </div>
           {children}

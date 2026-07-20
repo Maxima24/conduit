@@ -1,9 +1,17 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from 'react';
 import { useGSAP } from '@gsap/react';
 import { gsap } from 'gsap';
-import { Check, Copy, GripVertical, TerminalSquare } from 'lucide-react';
+import { Check, Copy, GripVertical } from 'lucide-react';
 import { ALL_SCOPES, SCOPE_GROUPS, type AccessEntity } from './access-data';
 import { ENDPOINTS } from './control-data';
 
@@ -38,8 +46,16 @@ export function PermissionInspector(props: PermissionInspectorProps) {
     () => {
       const timeline = gsap.timeline({ defaults: { ease: 'power3.out' } });
       timeline
-        .fromTo(rootRef.current, { clipPath: 'inset(0 0 0 4%)', opacity: 0.9 }, { clipPath: 'inset(0 0 0 0%)', opacity: 1, duration: 0.58 })
-        .from('[data-inspector-section]', { x: 5, opacity: 0.82, stagger: 0.07, duration: 0.38 }, '-=0.32');
+        .fromTo(
+          rootRef.current,
+          { clipPath: 'inset(0 0 0 3%)', opacity: 0.9 },
+          { clipPath: 'inset(0 0 0 0%)', opacity: 1, duration: 0.5 },
+        )
+        .from(
+          '[data-inspector-section]',
+          { x: 6, opacity: 0.84, stagger: 0.06, duration: 0.34 },
+          '-=0.26',
+        );
     },
     { scope: rootRef },
   );
@@ -60,18 +76,26 @@ export function PermissionInspector(props: PermissionInspectorProps) {
     () => {
       if (!lastChanged) return;
 
-      const endpointRow = Array.from(rootRef.current?.querySelectorAll<HTMLElement>('[data-endpoint-scope]') ?? [])
-        .find((row) => row.dataset.endpointScope === lastChanged);
+      const endpointRow = Array.from(
+        rootRef.current?.querySelectorAll<HTMLElement>('[data-endpoint-scope]') ?? [],
+      ).find((row) => row.dataset.endpointScope === lastChanged);
       const endpointStatus = endpointRow?.querySelector<HTMLElement>('[data-endpoint-status]');
+
       if (endpointRow) {
         gsap.fromTo(
           endpointRow,
           { backgroundColor: 'rgba(0,255,148,.09)' },
-          { backgroundColor: 'rgba(0,255,148,0)', duration: 0.4, ease: 'power2.out', clearProps: 'backgroundColor' },
+          {
+            backgroundColor: 'rgba(0,255,148,0)',
+            duration: 0.4,
+            ease: 'power2.out',
+            clearProps: 'backgroundColor',
+          },
         );
       }
+
       if (endpointStatus) {
-        const finalOpacity = grants.includes(lastChanged) ? 1 : 0.28;
+        const finalOpacity = grants.includes(lastChanged) ? 1 : 0.22;
         gsap.timeline()
           .set(endpointStatus, { opacity: 1 })
           .to(endpointStatus, { opacity: 0, duration: 0.08, ease: 'none' })
@@ -85,22 +109,31 @@ export function PermissionInspector(props: PermissionInspectorProps) {
       const previousScore = previousRiskRef.current;
       const arc = rootRef.current?.querySelector<SVGCircleElement>('[data-risk-arc]');
       const scoreLabel = rootRef.current?.querySelector<HTMLElement>('[data-risk-value]');
+
       if (arc) {
         gsap.fromTo(
           arc,
           { strokeDashoffset: circumference - (previousScore / 100) * circumference },
-          { strokeDashoffset: circumference - (risk.score / 100) * circumference, duration: 0.8, ease: 'power3.inOut' },
+          {
+            strokeDashoffset: circumference - (risk.score / 100) * circumference,
+            duration: 0.8,
+            ease: 'power3.inOut',
+          },
         );
       }
+
       if (scoreLabel) {
         const counter = { value: previousScore };
         gsap.to(counter, {
           value: risk.score,
           duration: 0.8,
           ease: 'power3.inOut',
-          onUpdate: () => { scoreLabel.textContent = String(Math.round(counter.value)); },
+          onUpdate: () => {
+            scoreLabel.textContent = String(Math.round(counter.value));
+          },
         });
       }
+
       previousRiskRef.current = risk.score;
     },
     { scope: rootRef, dependencies: [lastChanged, risk.score] },
@@ -123,100 +156,117 @@ export function PermissionInspector(props: PermissionInspectorProps) {
         aria-label="Resize effective SDK inspector"
         title="Drag to resize inspector"
         onPointerDown={onResizeStart}
-        className="group absolute inset-y-0 -left-2 z-30 hidden w-4 cursor-col-resize place-items-center xl:grid"
+        className="inspector-resize-handle group absolute inset-y-0 -left-3 z-30 hidden w-6 cursor-col-resize xl:flex"
       >
-        <span className="h-28 w-2 border border-white/15 bg-[#101010] transition group-hover:border-emerald-400/45 group-hover:bg-emerald-400/[0.08]">
-          <GripVertical className="relative -left-[3px] top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/30 group-hover:text-emerald-300" />
+        <span className="inspector-resize-track">
+          <GripVertical className="h-3.5 w-3.5" />
+          <small>RESIZE</small>
         </span>
       </button>
 
-      <div className="flex h-[76px] shrink-0 items-center border-b border-white/10 px-4">
+      <header className="inspector-header">
         <div>
-          <p className="font-mono text-[8px] uppercase tracking-[0.22em] text-white/25">Live inspector</p>
-          <h2 className="mt-1 font-display text-base font-medium text-white/85">Effective SDK Surface</h2>
+          <p>00 / POLICY MIRROR</p>
+          <h2>Effective SDK Surface</h2>
         </div>
-        <div className="ml-auto text-right">
-          <p className="font-mono text-[9px] text-white/58">{entity.label}</p>
-          <p className="mt-1 font-mono text-[8px] uppercase tracking-[0.14em] text-emerald-300/55">Policy linked</p>
+        <div className="text-right">
+          <strong>{entity.label}</strong>
+          <span>POLICY LINKED</span>
         </div>
-      </div>
+      </header>
 
       <div className="access-scroll min-h-0 flex-1 overflow-y-auto">
-        <section data-inspector-section className="grid grid-cols-[1fr_auto] gap-4 border-b border-white/10 p-4">
-          <div>
-            <p className="font-mono text-[8px] uppercase tracking-[0.22em] text-white/25">Permission risk</p>
-            <p className={`mt-3 text-2xl font-semibold ${risk.color}`}>{risk.level}</p>
-            <p className="mt-1 max-w-[190px] text-[11px] leading-5 text-white/32">Calculated from replay, mutation, admin, and credential privileges.</p>
+        <section data-inspector-section className="inspector-section inspector-risk-section">
+          <InspectorSectionRail index="01" label="Permission exposure" value={`${grants.length} grants`} />
+          <div className="inspector-risk-body">
+            <div>
+              <p className="inspector-risk-level" style={{ color: risk.color }}>{risk.level}</p>
+              <p className="inspector-risk-copy">
+                Weighted from replay, mutation, administration, and credential privileges.
+              </p>
+            </div>
+            <RiskDial score={risk.score} color={risk.color} />
           </div>
-          <RiskDial score={risk.score} color={risk.stroke} />
         </section>
 
-        <section data-inspector-section className="border-b border-white/10 p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <p className="font-mono text-[8px] uppercase tracking-[0.22em] text-white/25">Enabled endpoints</p>
-            <span className="font-mono text-[9px] text-white/40">{enabledEndpoints.length}/{ENDPOINTS.length}</span>
-          </div>
-          <div className="border border-white/[0.07]">
-            {ENDPOINTS.map((endpoint) => {
+        <section data-inspector-section className="inspector-section">
+          <InspectorSectionRail
+            index="02"
+            label="Endpoint ledger"
+            value={`${enabledEndpoints.length}/${ENDPOINTS.length} enabled`}
+          />
+          <div className="endpoint-ledger">
+            {ENDPOINTS.map((endpoint, index) => {
               const enabled = grants.includes(endpoint.scope);
               return (
                 <div
                   key={`${endpoint.method}-${endpoint.path}`}
                   data-endpoint-scope={endpoint.scope}
-                  className={`flex items-center gap-2 border-b border-white/[0.05] px-3 py-2.5 last:border-b-0 transition ${enabled ? 'bg-[#00ff94]/[0.025]' : 'opacity-25'}`}
+                  className={`endpoint-ledger-row ${enabled ? 'is-enabled' : ''}`}
                 >
-                  <span className={`w-10 font-mono text-[8px] ${enabled ? 'text-emerald-300/65' : 'text-white/25'}`}>{endpoint.method}</span>
-                  <span className="min-w-0 flex-1 truncate font-mono text-[9px] text-white/55">{endpoint.path}</span>
-                  <span data-endpoint-status className={`h-1.5 w-1.5 ${enabled ? 'bg-[#00ff94]' : 'bg-white/15'}`} />
+                  <span className="endpoint-index">{String(index + 1).padStart(2, '0')}</span>
+                  <span className="endpoint-method">{endpoint.method}</span>
+                  <code>{endpoint.path}</code>
+                  <span data-endpoint-status className="endpoint-status">
+                    {enabled ? 'OPEN' : 'LOCKED'}
+                  </span>
                 </div>
               );
             })}
           </div>
         </section>
 
-        <section data-inspector-section className="border-b border-white/10 p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <p className="flex items-center gap-2 font-mono text-[8px] uppercase tracking-[0.22em] text-white/25"><TerminalSquare className="h-3.5 w-3.5" /> Generated policy</p>
-            <button type="button" onClick={copyPolicy} className="flex items-center gap-1.5 font-mono text-[8px] uppercase tracking-[0.12em] text-white/28 hover:text-white">
-              {copied ? <Check className="h-3.5 w-3.5 text-emerald-300" /> : <Copy className="h-3.5 w-3.5" />}{copied ? 'Copied' : 'Copy'}
+        <section data-inspector-section className="inspector-section">
+          <InspectorSectionRail index="03" label="Generated policy" value="TYPESCRIPT" />
+          <div className="policy-source-head">
+            <span>policy.generated.ts</span>
+            <button type="button" onClick={copyPolicy}>
+              {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+              {copied ? 'Copied' : 'Copy source'}
             </button>
           </div>
-          <div className="overflow-x-auto border border-white/[0.07] bg-black/45 p-3 font-mono text-[9px] leading-[1.7]">
-            <p><span className="text-violet-300/65">const</span> <span className="text-white/70">sdk</span> <span className="text-white/25">=</span> <span className="text-violet-300/65">new</span> <span className="text-white/70">ConduitSDK</span><span className="text-white/30">({'{'}</span></p>
-            <p className="pl-3 text-white/42">apiKey,</p>
-            <p className="pl-3 text-white/42">permissions: {'{'}</p>
+          <div className="access-scroll policy-source overflow-x-auto">
+            <p><span className="policy-keyword">const</span> sdk = <span className="policy-keyword">new</span> ConduitSDK({'{'}</p>
+            <p className="pl-4 text-white/40">apiKey,</p>
+            <p className="pl-4 text-white/40">permissions: {'{'}</p>
             {SCOPE_GROUPS.map((group) => {
               const active = group.scopes.filter((scope) => grants.includes(scope.id));
               return (
-                <div key={group.id} className={`code-scope-line pl-6 ${active.some((scope) => scope.id === lastChanged) ? 'is-changing' : ''}`}>
-                  <span className={active.length ? 'text-emerald-200/60' : 'text-white/16'}>{group.id}: {'{'}</span>
+                <div
+                  key={group.id}
+                  className={`code-scope-line pl-8 ${active.some((scope) => scope.id === lastChanged) ? 'is-changing' : ''}`}
+                >
+                  <span className={active.length ? 'text-[#00ff94]/58' : 'text-white/14'}>
+                    {group.id}: {'{'}
+                  </span>
                   {group.scopes.map((scope) => (
-                    <p key={scope.id} className={`pl-3 ${grants.includes(scope.id) ? 'text-white/52' : 'text-white/13'}`}>
+                    <p
+                      key={scope.id}
+                      className={`pl-4 ${grants.includes(scope.id) ? 'text-white/52' : 'text-white/12'}`}
+                    >
                       {scope.id.split(':').at(-1)}: {grants.includes(scope.id) ? 'true' : 'false'},
                     </p>
                   ))}
-                  <span className={active.length ? 'text-emerald-200/60' : 'text-white/16'}>{'},'}</span>
+                  <span className={active.length ? 'text-[#00ff94]/58' : 'text-white/14'}>{'},'}</span>
                 </div>
               );
             })}
-            <p className="pl-3 text-white/30">{'}'}</p>
-            <p className="text-white/30">{'});'}</p>
+            <p className="pl-4 text-white/28">{'}'}</p>
+            <p className="text-white/28">{'});'}</p>
           </div>
         </section>
 
-        <section data-inspector-section className="p-4">
-          <div className="mb-4 flex items-center justify-between">
-            <p className="font-mono text-[8px] uppercase tracking-[0.22em] text-white/25">Permission history</p>
-            <span className="font-mono text-[8px] text-white/18">latest first</span>
-          </div>
-          <div className="relative pl-4 before:absolute before:inset-y-1 before:left-[3px] before:w-px before:bg-white/[0.08]">
-            {history.slice(0, 7).map((event) => (
-              <div key={event.id} className="relative pb-4 last:pb-0">
-                <span className={`absolute -left-4 top-1 h-2 w-2 border border-[#090909] ${event.tone === 'warning' ? 'bg-amber-300' : event.tone === 'success' ? 'bg-emerald-300' : 'bg-white/28'}`} />
-                <div className="flex items-start justify-between gap-3">
-                  <div><p className="font-mono text-[9px] text-white/55">{event.action}</p><p className="mt-1 text-[10px] leading-4 text-white/27">{event.detail}</p></div>
-                  <span className="shrink-0 font-mono text-[8px] text-white/18">{event.time}</span>
+        <section data-inspector-section className="inspector-section">
+          <InspectorSectionRail index="04" label="Policy history" value="LATEST FIRST" />
+          <div className="history-ledger">
+            {history.slice(0, 7).map((event, index) => (
+              <div key={event.id} className={`history-ledger-row is-${event.tone ?? 'neutral'}`}>
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                <div>
+                  <strong>{event.action}</strong>
+                  <p>{event.detail}</p>
                 </div>
+                <time>{event.time}</time>
               </div>
             ))}
           </div>
@@ -226,17 +276,48 @@ export function PermissionInspector(props: PermissionInspectorProps) {
   );
 }
 
+function InspectorSectionRail({ index, label, value }: { index: string; label: string; value: string }) {
+  return (
+    <div className="inspector-section-rail">
+      <span>{index}</span>
+      <strong>{label}</strong>
+      <small>{value}</small>
+    </div>
+  );
+}
+
 function RiskDial({ score, color }: { score: number; color: string }) {
   const radius = 31;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (score / 100) * circumference;
+
   return (
-    <div className="relative h-[82px] w-[82px]">
-      <svg viewBox="0 0 82 82" className="h-full w-full -rotate-90">
-        <circle cx="41" cy="41" r={radius} fill="none" stroke="rgba(255,255,255,.07)" strokeWidth="4" />
-        <circle data-risk-arc cx="41" cy="41" r={radius} fill="none" stroke={color} strokeWidth="4" strokeLinecap="square" strokeDasharray={circumference} strokeDashoffset={offset} className="risk-arc" />
+    <div className="risk-dial">
+      <svg viewBox="0 0 82 82" className="h-full w-full -rotate-90" aria-hidden="true">
+        <circle
+          cx="41"
+          cy="41"
+          r={radius}
+          fill="none"
+          stroke="rgba(255,255,255,.07)"
+          strokeWidth="3"
+        />
+        <circle
+          data-risk-arc
+          cx="41"
+          cy="41"
+          r={radius}
+          fill="none"
+          stroke={color}
+          strokeWidth="3"
+          strokeLinecap="square"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          className="risk-arc"
+        />
       </svg>
-      <span data-risk-value className="absolute inset-0 grid place-items-center font-mono text-[12px] text-white/68">{score}</span>
+      <span data-risk-value>{score}</span>
+      <small>RISK</small>
     </div>
   );
 }
@@ -246,14 +327,21 @@ function calculateRisk(grants: string[]) {
     100,
     grants.reduce((total, scopeId) => {
       const scope = ALL_SCOPES.find((item) => item.id === scopeId);
-      const weight = scope?.risk === 'critical' ? 18 : scope?.risk === 'high' ? 11 : scope?.risk === 'medium' ? 6 : 2;
+      const weight = scope?.risk === 'critical'
+        ? 18
+        : scope?.risk === 'high'
+          ? 11
+          : scope?.risk === 'medium'
+            ? 6
+            : 2;
       return total + weight;
     }, 0),
   );
-  if (score >= 70) return { score, level: 'CRITICAL', color: 'text-red-300', stroke: '#fca5a5' };
-  if (score >= 45) return { score, level: 'HIGH', color: 'text-orange-300', stroke: '#fdba74' };
-  if (score >= 22) return { score, level: 'MEDIUM', color: 'text-amber-300', stroke: '#fcd34d' };
-  return { score, level: 'LOW', color: 'text-emerald-300', stroke: '#6ee7b7' };
+
+  if (score >= 70) return { score, level: 'CRITICAL', color: '#fca5a5' };
+  if (score >= 45) return { score, level: 'HIGH', color: '#fdba74' };
+  if (score >= 22) return { score, level: 'MEDIUM', color: '#fcd34d' };
+  return { score, level: 'LOW', color: '#00ff94' };
 }
 
 function buildPolicySource(entity: AccessEntity, grants: string[]) {
