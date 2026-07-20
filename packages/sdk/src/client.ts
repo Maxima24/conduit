@@ -52,6 +52,7 @@ export class Conduit {
       baseUrl: options.baseUrl,
       fetch: fetchImpl.bind(globalThis),
       timeoutMs: options.timeoutMs ?? DEFAULT_TIMEOUT_MS,
+      ...(options.apiKey ? { apiKey: options.apiKey } : {}),
     });
   }
 

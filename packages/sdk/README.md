@@ -34,10 +34,19 @@ const report = await conduit.reconcile({ since: '2026-07-01' });
 ```ts
 const conduit = new Conduit({
   baseUrl: 'http://localhost:3001',
-  timeoutMs: 10_000, // optional, per request
-  fetch: myFetch,    // optional; defaults to global fetch (Node 18+)
+  apiKey: process.env.CONDUIT_API_KEY, // sent as `Authorization: Bearer <key>`
+  timeoutMs: 10_000,                   // optional, per request
+  fetch: myFetch,                      // optional; defaults to global fetch (Node 18+)
 });
 ```
+
+> **`apiKey` is a server-side secret — never ship it to a browser.** Put a proxy in front and
+> attach the key there. The Conduit dashboard does exactly that; see
+> `apps/web/src/app/api/conduit/[...path]/route.ts` for a working example.
+>
+> You can omit it only when the service runs with `CONDUIT_API_KEY` unset, which disables
+> authentication (local development). A wrong or missing key comes back as a `ConduitError`
+> with `code: 'UNAUTHORIZED'`.
 
 > **Run the service with `AUTO_DELIVER=false`.** By default the service auto-sends for every
 > event it receives, which is handy for demos but means an event would get *both* an
@@ -165,8 +174,9 @@ on `code` — it's stable; messages are not.
 
 ## Notes
 
-- **No authentication yet.** The SDK takes a base URL and nothing else, matching the service.
-  Don't expose Conduit publicly as-is.
+- **The service key is all-or-nothing.** One shared key, no scopes and no per-key revocation;
+  rotating it means restarting the service. There is also no user login on the dashboard, so
+  anyone who can load it can read the event log.
 - `template` and `data` are stored on the send and shown in the dashboard, but nothing renders
   them — templating is out of scope.
 - The `webhook` channel is in the type union but has no provider yet; it falls back to email.

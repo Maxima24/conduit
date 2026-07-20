@@ -15,7 +15,9 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 const SOURCE = 'stripe';
 const SECRET = process.env.WEBHOOK_SECRET_STRIPE ?? 'whsec_replace_me';
 
-const conduit = new Conduit({ baseUrl: BASE_URL });
+// The key is a server-side secret. Omit it only when the service runs with CONDUIT_API_KEY
+// unset (local development), which is the one case where auth is disabled.
+const conduit = new Conduit({ baseUrl: BASE_URL, apiKey: process.env.CONDUIT_API_KEY });
 
 function step(n: number, title: string): void {
   console.log(`\n${n}. ${title}`);

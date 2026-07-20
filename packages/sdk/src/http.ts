@@ -1,4 +1,4 @@
-import type { ApiError } from '@conduit/contracts';
+import { AUTH_HEADER, bearer, type ApiError } from '@conduit/contracts';
 import { ConduitError, ConduitTransportError } from './errors';
 
 /** Injectable so tests can pass a stub and callers can bring their own instrumented fetch. */
@@ -8,6 +8,8 @@ export interface HttpOptions {
   baseUrl: string;
   fetch: FetchLike;
   timeoutMs: number;
+  /** Sent on every request when set. */
+  apiKey?: string;
 }
 
 export interface RequestOptions {
@@ -56,6 +58,9 @@ export class Http {
           ...(options.rawBody !== undefined || options.body !== undefined
             ? { 'content-type': 'application/json' }
             : {}),
+          // Sent on every request, including webhook forwarding: the ingest route does not
+          // require it, but a caller may still be behind a gateway that does.
+          ...(this.options.apiKey ? { [AUTH_HEADER]: bearer(this.options.apiKey) } : {}),
           ...options.headers,
         },
         ...(options.rawBody !== undefined

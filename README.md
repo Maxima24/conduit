@@ -639,6 +639,7 @@ cp .env.example .env
 | `RESEND_API_KEY`          | API   | Resend API key. A real `re_...` key ⇒ **LIVE** mode (real email). Absent/placeholder ⇒ **SIMULATED** mode — retry/DLQ/replay behave identically but nothing is sent.      |
 | `DELIVERY_BACKOFF_CAP_MS` | API   | Ceiling for the exponential retry backoff (default `60000`).                                                                                                              |
 | `AUTO_DELIVER`            | API   | Auto-send for every ingested event (default `true`). Set `false` when using `@conduit/sdk`, where your code calls `conduit.send()` instead.                               |
+| `CONDUIT_API_KEY`         | API + Web | Shared service key. Every route requires it except `POST /webhooks/:source` (HMAC-authenticated) and `/health`. **Empty disables auth entirely** (with a boot warning) — set it for anything beyond localhost. The web app reads it *server-side* for its proxy; it is not `NEXT_PUBLIC_*`. |
 | `EMAIL_FROM`              | API   | From-address for outbound email.                                                                                                                                          |
 | `WEBHOOK_SECRET_<SOURCE>` | API   | Per-source HMAC secret, e.g. `WEBHOOK_SECRET_MONNIFY` (your Monnify client secret). If unset for a source, signature verification is **skipped in dev** (with a warning). |
 | `NEXT_PUBLIC_API_URL`     | Web   | Base URL of the API (exposed to the browser).                                                                                                                             |
@@ -807,7 +808,40 @@ curl "http://localhost:3001/reconcile"
 
 ## Authentication Flow
 
-Conduit has no user login — it is a machine-to-machine service. "Authentication" is **provider webhook verification** on ingest:
+Conduit has no user login — it is a machine-to-machine service. There are **two independent
+layers**, protecting two different things.
+
+### 1. The service key (who may call the API)
+
+A single shared key, `CONDUIT_API_KEY`, sent on every request as `Authorization: Bearer <key>`
+(or `x-api-key: <key>`). A global guard enforces it and compares in constant time.
+
+Two routes are exempt, by design:
+
+| Route | Why |
+|---|---|
+| `POST /webhooks/:source` | Stripe and friends cannot send our key. It is authenticated by its per-source HMAC instead — a stronger guarantee, since that proves the payload is untampered rather than merely that the caller knows a secret. |
+| `GET /health` | Liveness probes must work without credentials. |
+
+Exemption is **opt-out** (`@Public()`), so a newly added endpoint is protected by default.
+A forgotten guard is a silent hole; a forgotten `@Public()` is an immediate, obvious 401.
+
+Leaving `CONDUIT_API_KEY` empty disables the layer entirely and logs a loud warning at boot.
+That keeps local development, the seed script and the mock generator frictionless — but it
+means an unset variable in production is wide open, so set it.
+
+**The dashboard runs in a browser and therefore cannot hold the key.** Anything reachable
+from client code is readable in devtools. Instead the browser calls a same-origin proxy at
+`/api/conduit/*` ([route.ts](apps/web/src/app/api/conduit/[...path]/route.ts)) which attaches
+the key server-side. This is also what makes SSE work at all: `EventSource` cannot set request
+headers, so a key-protected `/stream` is unreachable from the browser without a proxy.
+
+> The proxy protects the **key**, not the data: it has no session of its own, so anyone who
+> can load the dashboard can use it. A real deployment needs a user login in front.
+
+### 2. Webhook signature verification (whether an event is genuine)
+
+
 
 1. The API is created with `rawBody: true` so the exact received bytes are available.
 2. A provider sends the HMAC signature in the `x-signature` header.
@@ -997,8 +1031,10 @@ for the detailed write-up and reproduction steps):
 **Still stubbed / not built:**
 
 - **`webhook` channel** — a valid `Channel` in the contract with no provider yet; falls back to email.
-- **Authentication** — the API is unauthenticated, so the SDK takes only a base URL. The
-  `/sdk/keys` and `/sdk/scopes` dashboard pages are static UI with no backend.
+- **Per-key management** — auth is one shared `CONDUIT_API_KEY`, not individually issued,
+  scoped, revocable keys. The `/sdk/keys` and `/sdk/scopes` dashboard pages remain static UI.
+- **A user login for the dashboard** — the proxy keeps the service key off the browser, but
+  the dashboard itself is unauthenticated.
 - **Hardened per-source HMAC schemes** — beyond generic HMAC-SHA256, including **Monnify's
   SHA-512 `monnify-signature`** scheme and mapping `eventData.transactionReference` → idempotency key.
 =======

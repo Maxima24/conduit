@@ -29,6 +29,11 @@ export class AppConfigService {
     return this.config.get('EMAIL_FROM', { infer: true });
   }
 
+  /** Shared service key. Empty means authentication is disabled (local dev only). */
+  get apiKey() {
+    return this.config.get('CONDUIT_API_KEY', { infer: true });
+  }
+
   /** Whether ingest HMAC verification is enforced (false = local/mock bypass). */
   get webhookVerifyEnabled() {
     return this.config.get('WEBHOOK_VERIFY', { infer: true });

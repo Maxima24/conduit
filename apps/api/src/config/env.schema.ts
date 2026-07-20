@@ -9,6 +9,15 @@ export const envSchema = z.object({
   WEB_ORIGIN: z.string().min(1).default('http://localhost:3000'),
   RESEND_API_KEY: z.string().default(''),
   EMAIL_FROM: z.string().default('conduit@example.dev'),
+  /**
+   * Shared key protecting the service. Every route except `POST /webhooks/:source` (which is
+   * HMAC-authenticated per source) and `GET /health` requires it.
+   *
+   * Left EMPTY, authentication is disabled and the API boots with a loud warning — which
+   * keeps local dev, the seed script and the mock generator frictionless. Always set it for
+   * anything reachable beyond localhost.
+   */
+  CONDUIT_API_KEY: z.string().default(''),
   // Ingest HMAC verification. Default on; set to 'false'/'0' to bypass locally (mock/FE dev).
   WEBHOOK_VERIFY: z
     .string()

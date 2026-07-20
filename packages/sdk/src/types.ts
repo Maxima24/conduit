@@ -44,6 +44,14 @@ export interface SendInput {
 export interface ConduitOptions {
   /** Base URL of the Conduit service, e.g. "http://localhost:3001". */
   baseUrl: string;
+  /**
+   * Shared service key, sent as `Authorization: Bearer <key>` on every request. Required
+   * unless the service is running with `CONDUIT_API_KEY` unset (local development).
+   *
+   * This is a server-side secret. Never ship it to a browser — put a proxy in front and
+   * attach the key there, which is what the Conduit dashboard does.
+   */
+  apiKey?: string;
   /** Defaults to global `fetch`. Override for tests, proxies, or instrumentation. */
   fetch?: FetchLike;
   /** Client-side timeout per request. Default 10s. */

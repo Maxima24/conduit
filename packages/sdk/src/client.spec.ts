@@ -275,6 +275,67 @@ describe('errors', () => {
   });
 });
 
+describe('authentication', () => {
+  it('sends the API key as a Bearer token on every request', async () => {
+    const { fetch, calls } = stubFetch({ body: {} });
+    const conduit = new Conduit({ baseUrl: BASE_URL, fetch, apiKey: 'sk_test_123' });
+
+    await conduit.stats();
+    await conduit.sends.replay('snd_1');
+
+    for (const call of calls) {
+      expect((call.init?.headers as Record<string, string>).authorization).toBe(
+        'Bearer sk_test_123',
+      );
+    }
+  });
+
+  it('sends no Authorization header when no key is configured', async () => {
+    const { fetch, calls } = stubFetch({ body: {} });
+
+    await client(fetch).stats();
+
+    expect((calls[0]?.init?.headers as Record<string, string>).authorization).toBeUndefined();
+  });
+
+  it('authenticates forwarded webhooks too, without disturbing the signature header', async () => {
+    const { fetch, calls } = stubFetch({ body: { id: 'e1', duplicate: false } });
+    const rawBody = Buffer.from('{"id":"evt_1"}');
+    const conduit = new Conduit({ baseUrl: BASE_URL, fetch, apiKey: 'sk_test_123' });
+
+    await conduit.handle(
+      { rawBody, signature: signPayload(SECRET, rawBody) },
+      { source: 'stripe', secret: SECRET },
+    );
+
+    const headers = calls[0]?.init?.headers as Record<string, string>;
+    expect(headers.authorization).toBe('Bearer sk_test_123');
+    expect(headers[SIGNATURE_HEADER]).toBe(signPayload(SECRET, rawBody));
+  });
+
+  it('surfaces a 401 from the service as a non-retryable ConduitError', async () => {
+    const { fetch } = stubFetch({
+      status: 401,
+      body: {
+        statusCode: 401,
+        code: 'UNAUTHORIZED',
+        message: 'Invalid API key.',
+        timestamp: '2026-07-20T00:00:00.000Z',
+        path: '/stats',
+      },
+    });
+
+    const error = (await client(fetch)
+      .stats()
+      .catch((e: unknown) => e)) as ConduitError;
+
+    expect(error).toBeInstanceOf(ConduitError);
+    expect(error.code).toBe('UNAUTHORIZED');
+    // Retrying with the same bad key would just fail again.
+    expect(error.retryable).toBe(false);
+  });
+});
+
 describe('construction', () => {
   it('trims a trailing slash off the base URL', async () => {
     const { fetch, calls } = stubFetch({ body: {} });
