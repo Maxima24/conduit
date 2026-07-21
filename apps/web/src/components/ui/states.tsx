@@ -5,14 +5,14 @@ export function LoadingState({ label = 'Loading telemetry' }: { label?: string }
   return (
     <div
       data-route-state
-      className="telemetry-state telemetry-loading-state relative flex min-h-[120px] items-center gap-5 overflow-hidden rounded-[20px] bg-gradient-to-b from-[#080808]/96 via-[#0b0b0b]/96 to-black/96 p-5"
+      className="telemetry-state telemetry-loading-state relative flex min-h-[120px] flex-col items-start gap-5 overflow-hidden rounded-[18px] bg-gradient-to-b from-[#080808]/96 via-[#0b0b0b]/96 to-black/96 p-4 sm:flex-row sm:items-center sm:rounded-[20px] sm:p-5"
       role="status"
     >
       <div className="telemetry-state-copy min-w-0">
         <span className="font-mono text-[8px] font-medium uppercase tracking-[0.18em] text-white/34">DATA LINK / SYNC</span>
         <strong className="mt-2 block font-sans text-[15px] font-semibold text-[#f5f5f5]">{label}</strong>
       </div>
-      <div className="telemetry-loading-segments ml-auto flex w-[min(38vw,430px)] gap-[4px]" aria-hidden="true">
+      <div className="telemetry-loading-segments flex w-full gap-[4px] sm:ml-auto sm:w-[min(38vw,430px)]" aria-hidden="true">
         {Array.from({ length: 18 }, (_, index) => (
           <i key={index} className="telemetry-loader-seg h-[28px] w-full -skew-x-[12deg] bg-[#262626]" style={{ animationDelay: `${[80,160,240][index % 3]}ms` }} />
         ))}
@@ -27,7 +27,7 @@ export function ErrorState({ error }: { error: unknown }) {
   return (
     <div
       data-route-state
-      className="telemetry-state relative flex min-h-[120px] items-center gap-5 overflow-hidden rounded-[20px] border border-[#A01016]/35 bg-gradient-to-b from-[#080808]/96 via-[#0b0b0b]/96 to-black/96 p-5"
+      className="telemetry-state relative flex min-h-[120px] flex-col items-start gap-4 overflow-hidden rounded-[18px] border border-[#A01016]/35 bg-gradient-to-b from-[#080808]/96 via-[#0b0b0b]/96 to-black/96 p-4 sm:flex-row sm:items-center sm:gap-5 sm:rounded-[20px] sm:p-5"
       role="alert"
     >
       <WarningCircle weight="bold" className="h-9 w-9 shrink-0 text-[#a01016]" />
@@ -36,14 +36,14 @@ export function ErrorState({ error }: { error: unknown }) {
         <strong className="mt-2 block font-sans text-[15px] font-semibold text-[#f5f5f5]">Live source unavailable</strong>
         <p className="mt-[7px] break-all text-[12px] text-[#666]">{message}</p>
       </div>
-      <b className="ml-auto font-mono text-[9px] uppercase tracking-[0.13em] text-[#a01016] p-[8px_11px]">OFFLINE</b>
+      <b className="font-mono text-[9px] uppercase tracking-[0.13em] text-[#a01016] sm:ml-auto">OFFLINE</b>
     </div>
   );
 }
 
 export function EmptyState({ children = 'Nothing here yet.' }: { children?: ReactNode }) {
   return (
-    <div data-route-state className="telemetry-state relative flex min-h-[120px] items-center justify-center gap-5 overflow-hidden rounded-[20px] bg-gradient-to-b from-[#080808]/96 via-[#0b0b0b]/96 to-black/96 p-5">
+    <div data-route-state className="telemetry-state relative flex min-h-[120px] flex-col items-center justify-center gap-4 overflow-hidden rounded-[18px] bg-gradient-to-b from-[#080808]/96 via-[#0b0b0b]/96 to-black/96 p-4 text-center sm:flex-row sm:gap-5 sm:rounded-[20px] sm:p-5 sm:text-left">
       {/* Radar circle with crosshairs and blip — pseudo-elements handled inline */}
       <div
         className="telemetry-empty-radar relative h-16 w-16 shrink-0 rounded-full border border-[#2e2e2e]

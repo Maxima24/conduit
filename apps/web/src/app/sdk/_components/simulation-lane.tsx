@@ -70,7 +70,7 @@ export function SimulationLane({ entityLabel, grants }: SimulationLaneProps) {
 
   return (
     <section ref={rootRef} className="min-h-full overflow-visible bg-gradient-to-b from-[#080808]/96 via-[#0b0b0b]/96 to-black/96">
-      <header className="flex flex-col gap-5 border-b border-white/[0.07] px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-7">
+      <header className="flex flex-col gap-4 border-b border-white/[0.07] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-7 sm:py-5">
         <div>
           <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-white/30">
             Request test
@@ -88,7 +88,7 @@ export function SimulationLane({ entityLabel, grants }: SimulationLaneProps) {
       </header>
 
       <div className="grid min-h-[430px] gap-px bg-white/[0.055] lg:grid-cols-[minmax(0,0.96fr)_minmax(300px,0.74fr)]">
-        <div className="relative overflow-visible bg-gradient-to-b from-[#080808]/98 via-[#0b0b0b]/98 to-black/98 p-6 sm:p-7">
+        <div className="relative overflow-visible bg-gradient-to-b from-[#080808]/98 via-[#0b0b0b]/98 to-black/98 p-4 sm:p-7">
           <label className="block">
             <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.18em] text-white/30">
               API endpoint
@@ -133,13 +133,13 @@ export function SimulationLane({ entityLabel, grants }: SimulationLaneProps) {
                           setEndpointOpen(false);
                         }}
                         className={[
-                          'grid h-12 w-full grid-cols-[84px_minmax(0,1fr)_auto] items-center rounded-[16px] px-3 text-left font-mono transition-[background-color,color] duration-150',
+                          'grid h-auto min-h-12 w-full grid-cols-[64px_minmax(0,1fr)] gap-2 rounded-[16px] px-3 py-2 text-left font-mono transition-[background-color,color] duration-150 sm:grid-cols-[84px_minmax(0,1fr)_auto] sm:gap-0 sm:py-0',
                           active ? 'bg-[#A01016]/16 text-white' : 'text-white/58 hover:bg-white/[0.055] hover:text-white',
                         ].join(' ')}
                       >
                         <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-white/62">{item.method}</span>
                         <span className="truncate text-[12px] font-semibold">{item.path}</span>
-                        <span className={['rounded-full px-2 py-1 text-[7px] uppercase tracking-[0.12em]', itemAllowed ? 'bg-emerald-400/10 text-emerald-200/70' : 'bg-[#A01016]/12 text-red-200/70'].join(' ')}>
+                        <span className={['col-span-2 w-fit rounded-full px-2 py-1 text-[7px] uppercase tracking-[0.12em] sm:col-span-1', itemAllowed ? 'bg-emerald-400/10 text-emerald-200/70' : 'bg-[#A01016]/12 text-red-200/70'].join(' ')}>
                           {itemAllowed ? 'open' : 'blocked'}
                         </span>
                       </button>
@@ -180,7 +180,7 @@ export function SimulationLane({ entityLabel, grants }: SimulationLaneProps) {
 
         <div
           className={[
-            'flex flex-col items-center justify-center bg-gradient-to-b from-[#080808]/96 via-[#0b0b0b]/96 to-black/96 p-8 text-center',
+            'flex min-h-[260px] flex-col items-center justify-center bg-gradient-to-b from-[#080808]/96 via-[#0b0b0b]/96 to-black/96 p-5 text-center sm:p-8',
             result === 'allowed' ? 'text-emerald-300/80' : result === 'denied' ? 'text-red-300/80' : 'text-white/35',
           ].join(' ')}
           aria-live="polite"

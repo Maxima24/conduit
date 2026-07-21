@@ -27,9 +27,9 @@ function prefersReducedMotion() {
 
 export function ConduitMark() {
   return (
-    <span className="relative grid h-16 w-[84px] place-items-center overflow-hidden rounded-2xl  bg-[#A01016]/[0.035] text-white/92 transition-[background-color,border-color,color] duration-200  group-hover/logo:bg-[#A01016]/[0.055] group-hover/logo:text-white">
-      <span className="absolute inset-y-0 left-0 w-[54px] bg-[radial-gradient(circle_at_center,rgba(160,16,22,0.18),transparent_70%)]" aria-hidden="true" />
-      <svg viewBox="0 0 44 44" className="relative z-10 h-6 w-6" aria-hidden="true">
+    <span className="relative grid h-10 w-10 place-items-center overflow-hidden rounded-[14px] bg-[#A01016]/[0.035] text-white/92 transition-[background-color,border-color,color] duration-200 group-hover/logo:bg-[#A01016]/[0.055] group-hover/logo:text-white sm:h-16 sm:w-[84px] sm:rounded-2xl">
+      <span className="absolute inset-y-0 left-0 w-8 bg-[radial-gradient(circle_at_center,rgba(160,16,22,0.18),transparent_70%)] sm:w-[54px]" aria-hidden="true" />
+      <svg viewBox="0 0 44 44" className="relative z-10 h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true">
         <path d="M8 8h11v5h-6v18h6v5H8z" fill="currentColor" />
         <path d="M25 8h11v28H25v-5h6V13h-6z" fill="currentColor" />
         <path d="M18 19h8v6h-8z" fill="currentColor" />
@@ -38,8 +38,8 @@ export function ConduitMark() {
       {/* <span className="absolute inset-x-0 bottom-0 h-px bg-[#A01016]/65" aria-hidden="true" /> */}
       {/* <span className="absolute bottom-0 left-0 top-0 w-px bg-[#A01016]/85" aria-hidden="true" /> */}
       {/* <span className="absolute bottom-0 right-0 top-0 w-px bg-[#A01016]/85" aria-hidden="true" /> */}
-      <span className="absolute bottom-[-2px] left-1/2 h-1 w-8 -translate-x-1/2 rounded-full bg-[#A01016]" aria-hidden="true" />
-      <span className="absolute right-2 top-1/2 flex -translate-y-1/2 flex-col gap-1" aria-hidden="true">
+      <span className="absolute bottom-[-2px] left-1/2 h-1 w-5 -translate-x-1/2 rounded-full bg-[#A01016] sm:w-8" aria-hidden="true" />
+      <span className="absolute right-2 top-1/2 hidden -translate-y-1/2 flex-col gap-1 sm:flex" aria-hidden="true">
         <span className="h-px w-3 bg-[#A01016]/65" />
         <span className="h-px w-2 bg-[#A01016]/40" />
         <span className="h-px w-3 bg-[#A01016]/55" />
@@ -231,7 +231,7 @@ export function StatusBadge({ state = 'live' }: StatusBadgeProps) {
 
   return (
     <div className="hidden w-full shrink-0 pb-5 pt-3 sm:block">
-      <div className="relative mx-auto grid h-16 w-[84px] place-items-center gap-1.5 overflow-hidden rounded-2xl  bg-[#A01016]/[0.028] px-2 py-2.5 font-mono uppercase tracking-[0.16em] text-white/44">
+      <div className="relative mx-auto grid h-14 w-[76px] place-items-center gap-1.5 overflow-hidden rounded-2xl bg-[#A01016]/[0.028] px-2 py-2.5 font-mono uppercase tracking-[0.16em] text-white/44 sm:h-16 sm:w-[84px]">
         <span className="absolute inset-y-0 left-0 w-[54px] bg-[radial-gradient(circle_at_center,rgba(160,16,22,0.16),transparent_72%)]" aria-hidden="true" />
         <span className="relative z-10 text-[6.5px] leading-none">SDK</span>
         <span className="relative grid h-2.5 w-2.5 place-items-center" aria-hidden="true">
@@ -243,7 +243,7 @@ export function StatusBadge({ state = 'live' }: StatusBadgeProps) {
         <span className="absolute inset-x-0 bottom-0 h-px bg-[#A01016]/55" aria-hidden="true" />
         <span className="absolute bottom-0 left-0 top-0 w-px bg-[#A01016]/75" aria-hidden="true" />
         <span className="absolute bottom-0 right-0 top-0 w-px bg-[#A01016]/75" aria-hidden="true" /> */}
-        <span className="absolute right-2 top-1/2 flex -translate-y-1/2 flex-col gap-1" aria-hidden="true">
+        <span className="absolute right-2 top-1/2 hidden -translate-y-1/2 flex-col gap-1 sm:flex" aria-hidden="true">
           <span className="h-px w-3 bg-[#A01016]/60" />
           <span className="h-px w-2 bg-[#A01016]/35" />
           <span className="h-px w-3 bg-[#A01016]/50" />

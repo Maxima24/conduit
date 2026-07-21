@@ -30,21 +30,19 @@ type PermissionInspectorProps = {
 };
 
 const inspectorShellClass = [
-  'relative flex w-full shrink-0 flex-col overflow-hidden border-t border-white/[0.06] bg-[#050505]/78 text-white backdrop-blur-2xl xl:my-3 xl:mr-3 xl:w-[var(--inspector-width)] xl:rounded-r-[24px] xl:border xl:border-white/[0.08]',
+  'relative flex max-h-[44dvh] min-h-[236px] w-full shrink-0 flex-col overflow-hidden border-t border-white/[0.06] bg-[#050505]/78 text-white backdrop-blur-2xl md:max-h-[38dvh] xl:my-3 xl:mr-3 xl:min-h-0 xl:max-h-none xl:w-[var(--inspector-width)] xl:rounded-r-[24px] xl:border xl:border-white/[0.08]',
   'backdrop-saturate-[125%]',
 ].join(' ');
 
 const transparentLayerClass = 'bg-transparent';
 
-const glassPanelClass = [
-  'flex flex-col border-t border-white/[0.07] bg-transparent px-4 py-3.5 sm:px-5',
-].join(' ');
+const glassPanelClass = 'flex flex-col border-t border-white/[0.07] bg-transparent px-3 py-3 sm:px-5 sm:py-3.5';
 
 const glassInnerClass = [
   'rounded-[14px] border border-white/[0.055] bg-white/[0.025] p-2',
 ].join(' ');
 
-const glassRowClass = 'flex items-center justify-between rounded-[11px] bg-white/[0.02] transition-colors hover:bg-white/[0.045]';
+const glassRowClass = 'flex min-w-0 items-center justify-between gap-3 rounded-[11px] bg-white/[0.02] transition-colors hover:bg-white/[0.045]';
 
 
 function cx(...classes: string[]) {
@@ -78,7 +76,7 @@ export function PermissionInspector(props: PermissionInspectorProps) {
         </span>
       </button>
 
-      <header className={cx('flex min-h-[78px] items-center justify-between border-b border-white/[0.07] bg-transparent px-4 py-3.5 sm:px-5', transparentLayerClass)}>
+      <header className={cx('flex min-h-[72px] items-center justify-between border-b border-white/[0.07] bg-transparent px-3 py-3 sm:min-h-[78px] sm:px-5 sm:py-3.5', transparentLayerClass)}>
         <div className="flex items-center gap-3">
           <span className="flex h-10 w-10 items-center justify-center rounded-[13px] border border-white/[0.055] bg-white/[0.035] text-white/70"><EntityIcon weight="duotone" className="h-5 w-5" /></span>
           <div>
@@ -88,13 +86,13 @@ export function PermissionInspector(props: PermissionInspectorProps) {
         </div>
       </header>
 
-      <div className={cx('access-scroll min-h-0 flex-1 overflow-y-auto bg-transparent p-3', transparentLayerClass)}>
-        <section data-summary-section className="grid grid-cols-2 overflow-hidden rounded-t-[18px] border border-white/[0.06] bg-white/[0.018]">
-          <div className="flex flex-col justify-center border-r border-white/[0.06] bg-transparent p-4">
+      <div className={cx('access-scroll min-h-0 flex-1 overflow-y-auto bg-transparent p-2.5 sm:p-3', transparentLayerClass)}>
+        <section data-summary-section className="grid grid-cols-1 overflow-hidden rounded-t-[16px] border border-white/[0.06] bg-white/[0.018] min-[420px]:grid-cols-2 sm:rounded-t-[18px]">
+          <div className="flex flex-col justify-center border-b border-white/[0.06] bg-transparent p-3.5 min-[420px]:border-b-0 min-[420px]:border-r sm:p-4">
             <span className="font-mono text-[8px] uppercase tracking-widest text-white/40">Allowed permissions</span>
             <strong data-summary-value className="mt-2 font-sans text-[28px] font-semibold leading-none text-white/90">{grants.length}<small className="ml-1 font-mono text-[11px] text-white/30">/18</small></strong>
           </div>
-          <div className="flex flex-col justify-center bg-transparent p-4">
+          <div className="flex flex-col justify-center bg-transparent p-3.5 sm:p-4">
             <span className="font-mono text-[8px] uppercase tracking-widest text-white/40">Risk level</span>
             <strong data-summary-value className="mt-2 font-sans text-[28px] font-semibold leading-none" style={{ color: risk.color }}>{risk.level}</strong>
           </div>
@@ -129,7 +127,7 @@ export function PermissionInspector(props: PermissionInspectorProps) {
             {enabledEndpoints.length ? enabledEndpoints.map((endpoint) => (
               <div key={`${endpoint.method}-${endpoint.path}`} data-endpoint-scope={endpoint.scope} className={cx('px-3 py-2', glassRowClass)}>
                 <span className="font-mono text-[9px] text-white/50 bg-transparent">{endpoint.method}</span>
-                <code className="font-mono text-[10px] text-white/80">{endpoint.path}</code>
+                <code className="min-w-0 truncate font-mono text-[10px] text-white/80">{endpoint.path}</code>
               </div>
             )) : (
               <p className="p-3 text-center text-xs text-white/40">No API endpoints are currently available.</p>

@@ -339,11 +339,11 @@ export function ScopeManager() {
   const status = dirty ? 'Draft' : unpublished ? 'Saved' : 'Synced';
 
   return (
-    <main ref={rootRef} className="relative flex h-[calc(100dvh-118px)] min-h-0 min-w-0 max-w-full flex-col overflow-hidden rounded-r-[28px] bg-gradient-to-b from-[#080808]/96 via-[#0b0b0b]/94 to-black/96 sm:h-[calc(100dvh-24px)] xl:flex-row">
-      <section className="relative z-10 flex min-h-0 min-w-0 flex-1 flex-col overflow-visible xl:rounded-l-[28px]">
+    <main ref={rootRef} className="relative flex h-[calc(100dvh-118px)] min-h-0 min-w-0 max-w-full flex-col overflow-hidden rounded-none bg-gradient-to-b from-[#080808]/96 via-[#0b0b0b]/94 to-black/96 sm:h-[calc(100dvh-24px)] sm:rounded-r-[28px] xl:flex-row">
+      <section className="relative z-10 flex min-h-0 min-w-0 flex-1 flex-col overflow-visible">
         <header className="relative z-[120] shrink-0 overflow-visible border-b border-white/[0.07] bg-gradient-to-r from-[#080808]/96 via-[#0b0b0b]/96 to-black/96">
-          <div data-command-head className="relative z-[130] grid min-h-[76px] grid-cols-1 items-center gap-[14px] px-5 py-3.5 md:grid-cols-[auto_minmax(260px,1fr)_auto] md:gap-[18px]">
-            <div className="min-w-[190px]">
+          <div data-command-head className="relative z-[130] grid min-h-[76px] grid-cols-1 items-center gap-[12px] px-3 py-3 sm:px-5 md:grid-cols-[auto_minmax(260px,1fr)_auto] md:gap-[18px] md:py-3.5">
+            <div className="min-w-0 md:min-w-[190px]">
               {/* <span>Control center</span> */}
               <h1 className="mt-1.5 font-sans text-[19px] font-semibold text-[#f5faf7]">SDK Policy Engine</h1>
             </div>
@@ -376,7 +376,7 @@ export function ScopeManager() {
                   aria-expanded={searchFocused}
                   aria-controls="sdk-search-panel"
                 />
-                <kbd className={['font-mono text-[8px] uppercase tracking-[0.08em] transition-colors duration-200', searchFocused ? 'text-white/45' : 'text-[#e2f0e7]/30'].join(' ')}>Enter</kbd>
+                <kbd className={['hidden font-mono text-[8px] uppercase tracking-[0.08em] transition-colors duration-200 sm:block', searchFocused ? 'text-white/45' : 'text-[#e2f0e7]/30'].join(' ')}>Enter</kbd>
               </form>
 
               {searchFocused ? (
@@ -417,7 +417,7 @@ export function ScopeManager() {
                             {item.detail}
                           </span>
                         </span>
-                        <span className="rounded-full bg-white/[0.04] px-2.5 py-1 font-mono text-[7.5px] font-semibold uppercase tracking-[0.12em] text-white/34">
+                        <span className="hidden rounded-full bg-white/[0.04] px-2.5 py-1 font-mono text-[7.5px] font-semibold uppercase tracking-[0.12em] text-white/34 sm:inline-flex">
                           {item.kicker}
                         </span>
                       </button>
@@ -432,9 +432,9 @@ export function ScopeManager() {
               ) : null}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex w-full items-center gap-2 md:w-auto">
               {/* ── Custom entity dropdown ─────────────────────── */}
-              <div ref={entityDropdownRef} className="relative z-[150]">
+              <div ref={entityDropdownRef} className="relative z-[150] w-full md:w-auto">
                 {/* Trigger */}
                 <button
                   type="button"
@@ -442,7 +442,7 @@ export function ScopeManager() {
                   aria-expanded={entityDropdownOpen}
                   onClick={() => setEntityDropdownOpen((o) => !o)}
                   className={[
-                    'group flex h-[46px] min-w-[168px] items-center gap-2.5 rounded-full border px-3.5',
+                    'group flex h-[46px] w-full min-w-0 items-center gap-2.5 rounded-full border px-3.5 md:min-w-[168px]',
                     entityDropdownOpen
                       ? 'border-white/[0.09] bg-[#101010]/96'
                       : 'border-transparent bg-white/[0.035] hover:bg-white/[0.055]',
@@ -479,7 +479,7 @@ export function ScopeManager() {
                     ref={entityMenuRef}
                     role="listbox"
                     aria-label="Select entity"
-                    className="absolute right-0 top-[calc(100%+10px)] z-[260] min-w-[264px] overflow-hidden rounded-[24px] border border-white/[0.1] bg-[#050505]/98 backdrop-blur-2xl"
+                    className="absolute left-0 right-0 top-[calc(100%+10px)] z-[260] overflow-hidden rounded-[22px] border border-white/[0.1] bg-[#050505]/98 backdrop-blur-2xl md:left-auto md:min-w-[264px] md:rounded-[24px]"
                   >
                     {/* Panel header */}
                     <div className="border-b border-white/[0.07] bg-white/[0.018] px-4 py-3">
@@ -554,17 +554,17 @@ export function ScopeManager() {
             </div>
           </div>
 
-          <div className="flex min-h-[58px] flex-col items-stretch justify-center gap-3 px-5 py-3 md:flex-row md:items-center md:justify-between md:py-1.5">
+          <div className="flex min-h-[58px] flex-col items-stretch justify-center gap-3 px-3 py-3 sm:px-5 md:flex-row md:items-center md:justify-between md:py-1.5">
             <ScopeViewSwitcher value={activeView} onChange={setActiveView} />
 
-            <div className="flex w-full flex-col gap-2 md:ml-auto md:w-auto md:flex-row md:flex-nowrap md:items-center">
-              <span data-status-label className="flex h-[46px] min-w-[120px] items-center rounded-full bg-[#A01016]/10 p-1.5 pr-4 transition-opacity">
+            <div className="access-scroll -mx-3 flex w-[calc(100%+24px)] gap-2 overflow-x-auto px-3 pb-1 md:mx-0 md:ml-auto md:w-auto md:overflow-visible md:px-0 md:pb-0">
+              <span data-status-label className="flex h-[46px] min-w-[124px] shrink-0 items-center rounded-full bg-[#A01016]/10 p-1.5 pr-4 transition-opacity">
                 <span className="mr-3 flex h-[34px] w-[34px] items-center justify-center rounded-full bg-white/5 text-white/50"><Check weight="bold" /></span>
                 <span className="flex flex-col justify-center"><small className="font-sans text-[10px] font-semibold text-white/40">Policy</small><strong className="font-sans text-[12px] font-bold text-[#A01016]">{status}</strong></span>
               </span>
 
-              <div className="grid w-full grid-cols-3 gap-2 md:flex md:w-auto md:flex-wrap md:items-center">
-                <MagneticFillButton type="button" onClick={generatePolicy} fillClassName="bg-[#A01016]" contentClassName="h-full w-full justify-start" className="group flex h-[46px] min-w-[150px] items-center rounded-full bg-white/[0.045] p-1.5 pr-4 text-white hover:bg-white/[0.075] md:min-w-[150px]">
+              <div className="flex shrink-0 gap-2 md:flex-wrap md:items-center">
+                <MagneticFillButton type="button" onClick={generatePolicy} fillClassName="bg-[#A01016]" contentClassName="h-full w-full justify-start" className="group flex h-[46px] min-w-[146px] shrink-0 items-center rounded-full bg-white/[0.045] p-1.5 pr-4 text-white hover:bg-white/[0.075] md:min-w-[150px]">
                   <span className="mr-3 flex h-[34px] w-[34px] items-center justify-center rounded-full bg-white/[0.07] text-white/54 transition-colors group-hover:text-white/90"><FileCode weight="bold" /></span>
                   <span className="flex flex-col justify-center text-left"><strong className="font-sans text-[11px] font-black uppercase tracking-widest text-white/90">Generate</strong><small className="font-sans text-[8px] font-bold uppercase tracking-widest text-white/40">SDK policy</small></span>
                 </MagneticFillButton>
@@ -575,7 +575,7 @@ export function ScopeManager() {
                   fillClassName="bg-[#A01016]"
                   contentClassName="h-full w-full justify-start"
                   className={[
-                    'group flex h-[46px] min-w-[120px] items-center rounded-full p-1.5 pr-4 disabled:pointer-events-none md:min-w-[130px]',
+                    'group flex h-[46px] min-w-[120px] shrink-0 items-center rounded-full p-1.5 pr-4 disabled:pointer-events-none md:min-w-[130px]',
                     dirty
                       ? 'bg-white/[0.075] text-white hover:bg-white/[0.105]'
                       : 'bg-white/[0.018] text-white/34 opacity-55',
@@ -591,7 +591,7 @@ export function ScopeManager() {
                   fillClassName="bg-[#A01016]"
                   contentClassName="h-full w-full justify-start"
                   className={[
-                    'group flex h-[46px] min-w-[140px] items-center rounded-full p-1.5 pr-4 disabled:pointer-events-none md:min-w-[140px]',
+                    'group flex h-[46px] min-w-[130px] shrink-0 items-center rounded-full p-1.5 pr-4 disabled:pointer-events-none md:min-w-[140px]',
                     unpublished
                       ? 'bg-[#A01016] text-white hover:bg-[#bd151d]'
                       : 'bg-white/[0.018] text-white/34 opacity-55',

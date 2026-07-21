@@ -51,7 +51,7 @@ export function EventDetailView({ id }: { id: string }) {
 
       {/* Payload card */}
       <Card className="!p-0">
-        <header className="flex min-h-[78px] items-center justify-between border-b border-[#262626] bg-[#161616] px-5 py-[15px]">
+        <header className="flex min-h-[78px] flex-col items-start justify-between gap-3 border-b border-[#262626] bg-[#161616] px-4 py-[15px] sm:flex-row sm:items-center sm:px-5">
           <div>
             <b className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#a01016]">DATA / PAYLOAD</b>
             <h2 className="mt-[5px] font-sans text-[18px] font-semibold text-[#f5f5f5]">Normalized event body</h2>
@@ -68,7 +68,7 @@ export function EventDetailView({ id }: { id: string }) {
       {/* Send register */}
       <section className="grid gap-[14px]">
         {/* Section rail header */}
-        <div className="flex min-h-[78px] items-center justify-between overflow-hidden rounded-[20px] border border-[#262626] bg-[#161616] px-5 py-[15px]">
+        <div className="flex min-h-[78px] items-center justify-between gap-4 overflow-hidden rounded-[18px] border border-[#262626] bg-[#161616] px-4 py-[15px] sm:rounded-[20px] sm:px-5">
           <div>
             <span className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-[#666]">DELIVERY / OUTPUT</span>
             <h2 className="mt-[5px] font-sans text-[18px] font-semibold text-[#f5f5f5]">Send telemetry</h2>
@@ -80,7 +80,7 @@ export function EventDetailView({ id }: { id: string }) {
 
         {data.sends.length ? data.sends.map((send, index) => (
           <Card key={send.id} className="!p-0">
-            <header className="grid min-h-[92px] grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-4 border-b border-[#262626] bg-[#111] px-5 py-4 sm:[grid-template-columns:auto_minmax(0,1fr)_auto_auto]">
+            <header className="grid min-h-[92px] grid-cols-[auto_minmax(0,1fr)] items-center gap-4 border-b border-[#262626] bg-[#111] px-4 py-4 sm:grid-cols-[auto_minmax(0,1fr)_auto_auto] sm:px-5">
               {/* Index badge */}
               <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[#2e2e2e] font-mono text-[10px] font-semibold text-[#a01016]">
                 {String(index + 1).padStart(2, '0')}
@@ -90,7 +90,7 @@ export function EventDetailView({ id }: { id: string }) {
                 <h3 className="mt-[5px] overflow-hidden text-ellipsis whitespace-nowrap font-sans text-[17px] text-[#f5f5f5]">{send.to}</h3>
               </div>
               {/* Attempt count */}
-              <div className="flex flex-col items-end">
+              <div className="col-start-2 flex flex-row items-center gap-2 justify-self-start sm:col-start-auto sm:flex-col sm:items-end sm:justify-self-auto sm:gap-0">
                 <strong className="font-mono text-[25px] text-[#f5f5f5]">{String(send.attempts).padStart(2, '0')}</strong>
                 <span className="font-mono text-[8px] uppercase text-[#666]">attempts</span>
               </div>

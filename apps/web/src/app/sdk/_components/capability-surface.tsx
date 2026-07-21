@@ -179,7 +179,7 @@ export function CapabilitySurface(props: CapabilitySurfaceProps) {
         data-permission-state
         role="group"
         aria-label={`Permission state for ${copy.title}`}
-        className="relative grid h-8 w-[116px] grid-cols-2 items-center overflow-hidden rounded-full bg-black/58 p-0.5"
+        className="relative grid h-8 w-[108px] grid-cols-2 items-center overflow-hidden rounded-full bg-black/58 p-0.5 sm:w-[116px]"
       >
         <span
           data-permission-thumb
@@ -233,7 +233,7 @@ export function CapabilitySurface(props: CapabilitySurfaceProps) {
               aria-expanded={!collapsed}
               onClick={() => toggleGroup(group.id, orderedScopes[0].id)}
               className={[
-                'group/capability relative flex min-h-[92px] w-full items-center gap-4 px-6 py-4 text-left transition-[background-color,color] duration-220 ease-[cubic-bezier(.23,1,.32,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/12',
+        'group/capability relative flex min-h-[86px] w-full items-center gap-3 px-4 py-3.5 text-left transition-[background-color,color] duration-220 ease-[cubic-bezier(.23,1,.32,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/12 sm:min-h-[92px] sm:gap-4 sm:px-6 sm:py-4',
                 selected
                   ? 'bg-white/[0.032] text-white'
                   : 'bg-transparent text-white/76 hover:bg-white/[0.024] hover:text-white',
@@ -247,7 +247,7 @@ export function CapabilitySurface(props: CapabilitySurfaceProps) {
                 aria-hidden="true"
               />
               <span className={[
-                'grid h-11 w-11 shrink-0 place-items-center rounded-[16px] transition-[background-color,color,transform] duration-180 group-hover/capability:translate-x-1',
+                'grid h-10 w-10 shrink-0 place-items-center rounded-[14px] transition-[background-color,color,transform] duration-180 group-hover/capability:translate-x-1 sm:h-11 sm:w-11 sm:rounded-[16px]',
                 selected ? 'bg-[#A01016]/14 text-white/88' : 'bg-white/[0.04] text-white/52 group-hover/capability:bg-white/[0.06] group-hover/capability:text-white/78',
               ].join(' ')}>
                 <Icon weight="regular" className="h-5 w-5" />
@@ -293,9 +293,9 @@ export function CapabilitySurface(props: CapabilitySurfaceProps) {
                 selected ? 'bg-[#A01016]/[0.025]' : '',
               ].join(' ')}
             >
-              <td className="w-[230px] px-5 py-3.5 align-middle">
+              <td className="w-[196px] px-4 py-3.5 align-middle sm:w-[230px] sm:px-5">
                 <div className="relative">
-                  <span className="absolute -left-5 top-1/2 h-7 w-0.5 -translate-y-1/2 rounded-r-full bg-[#A01016] opacity-0 transition-opacity duration-[180ms] group-hover/permission:opacity-100 group-focus-within/permission:opacity-100" />
+                  <span className="absolute -left-4 top-1/2 h-7 w-0.5 -translate-y-1/2 rounded-r-full bg-[#A01016] opacity-0 transition-opacity duration-[180ms] group-hover/permission:opacity-100 group-focus-within/permission:opacity-100 sm:-left-5" />
                   <strong className="block truncate font-sans text-[13px] font-semibold tracking-[-0.01em] text-white/82 transition-colors duration-[180ms] group-hover/permission:text-white">
                     {copy.title}
                   </strong>
@@ -310,15 +310,15 @@ export function CapabilitySurface(props: CapabilitySurfaceProps) {
                 </div>
               </td>
 
-              <td className="w-[150px] px-4 py-3.5 align-middle">
+              <td className="w-[130px] px-3 py-3.5 align-middle sm:w-[150px] sm:px-4">
                 <code className="font-mono text-[10px] text-white/40">{scope.id}</code>
               </td>
 
-              <td className="px-4 py-3.5 align-middle">
+              <td className="px-3 py-3.5 align-middle sm:px-4">
                 <p className="text-[12px] leading-relaxed text-white/42">{copy.summary}</p>
               </td>
 
-              <td className="w-[146px] px-3 py-3.5 align-middle">
+              <td className="w-[126px] px-2 py-3.5 align-middle sm:w-[146px] sm:px-3">
                 {renderAccessControl(group, scope, granted)}
               </td>
             </tr>
@@ -331,7 +331,7 @@ export function CapabilitySurface(props: CapabilitySurfaceProps) {
   return (
     <section ref={rootRef} className="min-h-full overflow-visible bg-gradient-to-b from-[#080808]/96 via-[#0b0b0b]/96 to-black/96">
       <div className="flex min-h-full flex-col">
-        <header className="flex flex-col gap-5 border-b border-white/[0.06] bg-transparent px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-7">
+        <header className="flex flex-col gap-4 border-b border-white/[0.06] bg-transparent px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-7 sm:py-5">
           <div>
             <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-white/30">
               Effective permissions
@@ -368,22 +368,22 @@ export function CapabilitySurface(props: CapabilitySurfaceProps) {
           </div>
         </header>
 
-        <div className="max-w-full flex-1 overflow-x-auto px-4 py-3 [scrollbar-gutter:stable] md:overflow-x-visible sm:px-6">
-          <div className="w-full min-w-[760px] bg-gradient-to-b from-[#080808]/96 via-[#0b0b0b]/96 to-black/96">
+        <div className="access-scroll max-w-full flex-1 overflow-x-auto px-3 py-3 [scrollbar-gutter:stable] lg:overflow-x-visible sm:px-6">
+          <div className="w-full min-w-[680px] bg-gradient-to-b from-[#080808]/96 via-[#0b0b0b]/96 to-black/96 sm:min-w-[760px]">
             <table className="w-full table-fixed border-collapse">
               <caption className="sr-only">SDK capability permission table</caption>
               <thead className="sticky top-0 z-30 bg-gradient-to-r from-[#080808] via-[#0b0b0b] to-black">
                 <tr className="border-b border-white/[0.08] font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white/42">
-                  <th scope="col" className="sticky top-0 z-30 w-[230px] bg-[#090909] px-5 py-3 text-left">
+                  <th scope="col" className="sticky top-0 z-30 w-[196px] bg-[#090909] px-4 py-3 text-left sm:w-[230px] sm:px-5">
                     Permission
                   </th>
-                  <th scope="col" className="sticky top-0 z-30 w-[150px] bg-[#090909] px-4 py-3 text-left">
+                  <th scope="col" className="sticky top-0 z-30 w-[130px] bg-[#090909] px-3 py-3 text-left sm:w-[150px] sm:px-4">
                     SDK ID
                   </th>
-                  <th scope="col" className="sticky top-0 z-30 bg-[#090909] px-4 py-3 text-left">
+                  <th scope="col" className="sticky top-0 z-30 bg-[#090909] px-3 py-3 text-left sm:px-4">
                     Summary
                   </th>
-                  <th scope="col" className="sticky top-0 z-30 w-[146px] bg-[#090909] px-3 py-3 text-left">
+                  <th scope="col" className="sticky top-0 z-30 w-[126px] bg-[#090909] px-2 py-3 text-left sm:w-[146px] sm:px-3">
                     Access
                   </th>
                 </tr>

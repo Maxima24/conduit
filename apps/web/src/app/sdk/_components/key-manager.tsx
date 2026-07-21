@@ -171,24 +171,24 @@ export function KeyManager() {
 
   return (
     <main
-      className="relative flex h-[calc(100dvh-118px)] w-full min-w-0 max-w-full flex-col overflow-hidden rounded-r-[28px] bg-gradient-to-b from-[#080808]/96 via-[#0b0b0b]/96 to-black/96 sm:h-[calc(100dvh-24px)]"
+      className="relative flex h-[calc(100dvh-118px)] w-full min-w-0 max-w-full flex-col overflow-hidden rounded-none bg-gradient-to-b from-[#080808]/96 via-[#0b0b0b]/96 to-black/96 sm:h-[calc(100dvh-24px)] sm:rounded-r-[28px]"
     >
       <header className="shrink-0 border-b border-white/[0.07] bg-gradient-to-r from-[#080808]/96 via-[#0b0b0b]/96 to-black/96">
-        <div className="flex min-h-[108px] flex-wrap items-center gap-5 px-4 py-4 sm:px-5 lg:px-7">
+        <div className="flex min-h-[108px] flex-wrap items-center gap-4 px-3 py-4 sm:gap-5 sm:px-5 lg:px-7">
           <div className="mobile-command-copy w-full min-w-0 sm:w-auto">
             <h1 className="font-mono text-[10px] font-medium uppercase tracking-[0.32em] text-white/48 sm:text-[11px]">
               API Keys
             </h1>
-            <p className="mt-3 max-w-[620px] font-body text-lg leading-7 text-white/78 sm:text-xl">
+            <p className="mt-3 max-w-[620px] font-body text-base leading-7 text-white/78 sm:text-xl">
               Create and manage credentials for SDK access.
             </p>
           </div>
 
-          <div className="command-dock flex w-full flex-wrap items-center gap-5 sm:ml-auto sm:w-auto sm:justify-end">
-            <MagneticFillLink href="/sdk/scopes" fillClassName="bg-[#A01016]" className="inline-flex h-11 items-center gap-2 rounded-2xl bg-white/[0.04] px-4 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-white/62 hover:bg-white/[0.07] hover:text-white">
+          <div className="command-dock grid w-full grid-cols-1 gap-2 min-[420px]:grid-cols-2 sm:ml-auto sm:w-auto sm:flex sm:flex-wrap sm:items-center sm:justify-end">
+            <MagneticFillLink href="/sdk/scopes" fillClassName="bg-[#A01016]" className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-white/[0.04] px-4 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-white/62 hover:bg-white/[0.07] hover:text-white">
               <ArrowLeft className="h-3.5 w-3.5" /> <span>Permissions</span>
             </MagneticFillLink>
-            <MagneticFillButton type="button" onClick={() => openConstructor()} fillClassName="bg-[#A01016]" className="inline-flex h-11 items-center gap-2 rounded-2xl bg-[#A01016] px-4 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-white hover:bg-[#bd151d]">
+            <MagneticFillButton type="button" onClick={() => openConstructor()} fillClassName="bg-[#A01016]" className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-[#A01016] px-4 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-white hover:bg-[#bd151d]">
               <Plus className="h-3.5 w-3.5" /> <span>Generate key</span>
             </MagneticFillButton>
           </div>
@@ -206,7 +206,7 @@ export function KeyManager() {
 
       <div className="access-scroll relative min-h-0 flex-1 overflow-y-auto">
         <div className="relative w-full min-w-0">
-          <div className="flex items-end justify-between gap-4 border-b border-white/[0.07] px-5 py-5 sm:px-7">
+          <div className="flex flex-col gap-3 border-b border-white/[0.07] px-4 py-4 min-[420px]:flex-row min-[420px]:items-end min-[420px]:justify-between sm:px-7 sm:py-5">
             <div>
               <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-white/36">Credentials</p>
               <h2 className="mt-1 font-sans text-[28px] font-semibold tracking-[-0.05em] text-white">API keys</h2>
@@ -215,8 +215,8 @@ export function KeyManager() {
           </div>
 
           <section className="access-scroll w-full overflow-x-auto !rounded-none !border-0 !bg-transparent">
-            <div className="min-w-[920px]">
-              <div className="grid grid-cols-[minmax(300px,1.8fr)_minmax(130px,0.75fr)_minmax(150px,0.9fr)_80px_minmax(120px,0.7fr)_120px_36px] items-center border-y border-white/[0.06] bg-[#090909]/96 px-5 py-4 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/40 backdrop-blur-xl sm:px-7" aria-hidden="true">
+            <div className="min-w-0 lg:min-w-[920px]">
+              <div className="hidden grid-cols-[minmax(300px,1.8fr)_minmax(130px,0.75fr)_minmax(150px,0.9fr)_80px_minmax(120px,0.7fr)_120px_36px] items-center border-y border-white/[0.06] bg-[#090909]/96 px-5 py-4 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/40 backdrop-blur-xl sm:px-7 lg:grid" aria-hidden="true">
                 <span>Key</span>
                 <span>Environment</span>
                 <span>Owner</span>
@@ -285,13 +285,13 @@ function KeyModule({ record, index, onClick }: { record: KeyRecord; index: numbe
       data-key-module
       onClick={onClick}
       className={[
-        'group/key relative grid min-h-[92px] w-full grid-cols-[minmax(300px,1.8fr)_minmax(130px,0.75fr)_minmax(150px,0.9fr)_80px_minmax(120px,0.7fr)_120px_36px] items-center border-b border-white/[0.055] bg-transparent px-5 py-4 text-left transition-[background-color,color] duration-200 last:border-b-0 hover:bg-white/[0.025] sm:px-7',
+        'group/key relative grid min-h-[132px] w-full grid-cols-2 items-center gap-x-4 gap-y-3 border-b border-white/[0.055] bg-transparent px-4 py-4 text-left transition-[background-color,color] duration-200 last:border-b-0 hover:bg-white/[0.025] sm:px-7 md:grid-cols-[minmax(280px,1.4fr)_minmax(120px,0.7fr)_minmax(140px,0.8fr)] lg:min-h-[92px] lg:grid-cols-[minmax(300px,1.8fr)_minmax(130px,0.75fr)_minmax(150px,0.9fr)_80px_minmax(120px,0.7fr)_120px_36px] lg:gap-0',
         active ? 'text-white/78' : 'text-white/34',
       ].join(' ')}
     >
       {active ? <span className="absolute left-0 top-1/2 h-[44px] w-[3px] -translate-y-1/2 rounded-r-full bg-[#A01016]" aria-hidden="true" /> : null}
 
-      <div className="grid min-w-0 grid-cols-[34px_minmax(0,1fr)] items-center gap-4">
+      <div className="col-span-2 grid min-w-0 grid-cols-[34px_minmax(0,1fr)] items-center gap-4 md:col-span-1">
         <span className="font-mono text-[10px] font-medium text-white/38 transition-colors group-hover/key:text-[#d14a51]">
           K-{String(index + 1).padStart(2, '0')}
         </span>
@@ -373,7 +373,7 @@ function CredentialInspector({
     >
       <aside
         ref={drawerRef}
-        className="flex h-full w-full max-w-[540px] flex-col overflow-hidden rounded-l-[24px] border border-white/[0.08] bg-[#050505]/96 text-white backdrop-blur-2xl sm:rounded-[24px]"
+        className="flex h-full w-full max-w-[540px] flex-col overflow-hidden rounded-none border border-white/[0.08] bg-[#050505]/96 text-white backdrop-blur-2xl sm:rounded-[24px]"
         onMouseDown={(event) => event.stopPropagation()}
       >
         <DrawerHeader index="02" label="Credential inspector" title={record.id} compact onClose={() => requestClose()} />
@@ -415,23 +415,24 @@ function CredentialInspector({
           </section>
         </div>
 
-        <div className="grid shrink-0 grid-cols-2 gap-2 border-t border-white/[0.07] bg-black/60 p-2">
+        <div className="grid shrink-0 grid-cols-2 gap-2 border-t border-white/[0.07] bg-black/60 px-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2">
           <MagneticFillButton
             type="button"
             onClick={() => requestClose(onRotate)}
             fillClassName="bg-[#A01016]"
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-[16px] rounded-bl-[22px] border border-[#A01016]/50 bg-[#A01016] font-mono text-[8px] font-semibold uppercase tracking-[0.14em] text-white hover:border-[#ff5660]/70 hover:bg-[#bd151d]"
+            className="inline-flex h-11 min-w-0 items-center justify-center gap-2 rounded-[15px] border border-[#A01016]/50 bg-[#A01016] font-mono text-[7.5px] font-semibold uppercase tracking-[0.12em] text-white hover:border-[#ff5660]/70 hover:bg-[#bd151d] sm:h-12 sm:rounded-[16px] sm:rounded-bl-[22px] sm:text-[8px] sm:tracking-[0.14em]"
           >
-            <ArrowsClockwise className="h-4 w-4" weight="bold" /> <span>Rotate credential</span>
+            <ArrowsClockwise className="h-4 w-4 shrink-0" weight="bold" />
+            <span className="truncate"><span className="sm:hidden">Rotate</span><span className="hidden sm:inline">Rotate credential</span></span>
           </MagneticFillButton>
           <MagneticFillButton
             type="button"
             disabled={record.status === 'Revoked'}
             onClick={onRevoke}
             fillClassName="bg-[#A01016]"
-            className="inline-flex h-12 items-center justify-center rounded-[16px] border border-white/[0.055] bg-white/[0.025] font-mono text-[8px] font-semibold uppercase tracking-[0.14em] text-red-300/38 hover:border-[#A01016]/45 hover:bg-red-500/10 hover:text-red-100 disabled:pointer-events-none disabled:opacity-35"
+            className="inline-flex h-11 min-w-0 items-center justify-center rounded-[15px] border border-white/[0.055] bg-white/[0.025] font-mono text-[7.5px] font-semibold uppercase tracking-[0.12em] text-red-300/38 hover:border-[#A01016]/45 hover:bg-red-500/10 hover:text-red-100 disabled:pointer-events-none disabled:opacity-35 sm:h-12 sm:rounded-[16px] sm:text-[8px] sm:tracking-[0.14em]"
           >
-            <span>Revoke access</span>
+            <span className="truncate"><span className="sm:hidden">Revoke</span><span className="hidden sm:inline">Revoke access</span></span>
           </MagneticFillButton>
         </div>
       </aside>
@@ -550,14 +551,14 @@ function CredentialConstructor(props: ConstructorProps) {
     >
       <aside
         ref={drawerRef}
-        className="flex h-full w-full max-w-[600px] flex-col overflow-hidden rounded-l-[28px] border border-white/[0.08] bg-[#050505]/96 text-white backdrop-blur-2xl sm:rounded-[28px]"
+        className="flex h-full w-full max-w-[600px] flex-col overflow-hidden rounded-none border border-white/[0.08] bg-[#050505]/96 text-white backdrop-blur-2xl sm:rounded-[28px]"
         onMouseDown={(event) => event.stopPropagation()}
       >
         <DrawerHeader index="03" label="Credential constructor" title="Generate API key" onClose={requestClose} />
 
-        <div ref={contentRef} className="min-h-0 flex-1">
+        <div ref={contentRef} className="min-h-0 flex-1 overflow-hidden">
           {generatedKey ? (
-            <div className="flex h-full flex-col justify-start px-5 py-6 sm:px-7">
+            <div className="access-scroll flex h-full flex-col justify-start overflow-y-auto px-4 py-5 sm:px-7 sm:py-6">
               <span className="grid h-10 w-10 place-items-center rounded-[14px] bg-[#A01016] text-white">
                 <ShieldCheck className="h-4 w-4" weight="bold" />
               </span>
@@ -589,7 +590,7 @@ function CredentialConstructor(props: ConstructorProps) {
                 event.preventDefault();
                 onGenerate();
               }}
-              className="access-scroll flex h-full flex-col overflow-y-auto px-6 py-6 sm:px-8"
+              className="access-scroll flex h-full min-h-0 flex-col overflow-y-auto overscroll-contain px-4 py-5 pb-[calc(env(safe-area-inset-bottom)+1rem)] sm:px-8 sm:py-6"
             >
               <div className="pb-5 pt-3">
                 <FieldLabel>Key label</FieldLabel>
@@ -597,7 +598,7 @@ function CredentialConstructor(props: ConstructorProps) {
                   value={label}
                   onChange={(event) => onLabelChange(event.target.value)}
                   placeholder="Production worker"
-                  className="mt-2 h-[68px] rounded-[22px] border border-white/[0.1] bg-white/[0.04] px-6 font-sans text-[17px] font-semibold text-white outline-none transition-[background-color,border-color] duration-180 placeholder:text-white/24 hover:bg-white/[0.055] focus:border-white/[0.16] focus:bg-white/[0.06]"
+                  className="mt-2 h-[60px] rounded-[20px] border border-white/[0.1] bg-white/[0.04] px-4 font-sans text-[16px] font-semibold text-white outline-none transition-[background-color,border-color] duration-180 placeholder:text-white/24 hover:bg-white/[0.055] focus:border-white/[0.16] focus:bg-white/[0.06] sm:h-[68px] sm:rounded-[22px] sm:px-6 sm:text-[17px]"
                 />
               </div>
 
@@ -678,7 +679,7 @@ function CredentialConstructor(props: ConstructorProps) {
                 <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-white/38">{selectedScopes.length} / 18</span>
               </div>
 
-              <div className="access-scroll mt-2 max-h-[244px] overflow-y-auto rounded-[20px] border border-white/[0.06] bg-white/[0.025]">
+              <div className="access-scroll mt-2 max-h-[150px] overflow-y-auto rounded-[18px] border border-white/[0.06] bg-white/[0.025] sm:max-h-[244px] sm:rounded-[20px]">
                 {ALL_SCOPES.map((scope, index) => {
                   const checked = selectedScopes.includes(scope.id);
                   return (
@@ -713,7 +714,7 @@ function CredentialConstructor(props: ConstructorProps) {
               <MagneticFillButton
                 type="submit"
                 fillClassName="bg-[#A01016]"
-                className="mt-4 inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-[16px] border border-[#A01016]/50 bg-[#A01016] font-mono text-[8px] font-semibold uppercase tracking-[0.14em] text-white hover:border-[#ff5660]/70 hover:bg-[#bd151d]"
+                className="sticky bottom-0 z-10 mt-4 inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-[16px] border border-[#A01016]/50 bg-[#A01016] font-mono text-[8px] font-semibold uppercase tracking-[0.14em] text-white hover:border-[#ff5660]/70 hover:bg-[#bd151d]"
               >
                 <Plus className="h-4 w-4" /> <span>Generate credential</span>
               </MagneticFillButton>
@@ -739,11 +740,11 @@ function DrawerHeader({
   onClose: () => void;
 }) {
   return (
-    <header className={['flex shrink-0 items-start gap-4 border-b border-white/[0.07] bg-white/[0.012]', compact ? 'px-5 py-3.5 sm:px-6' : 'px-6 py-5 sm:px-8'].join(' ')}>
+    <header className={['flex shrink-0 items-start gap-3 border-b border-white/[0.07] bg-white/[0.012] sm:gap-4', compact ? 'px-4 py-3.5 sm:px-6' : 'px-4 py-4 sm:px-8 sm:py-5'].join(' ')}>
       <span className={['mt-1 font-mono font-semibold text-[#d14a51]/70', compact ? 'text-[9px]' : 'text-[11px]'].join(' ')}>{index}</span>
       <div className="min-w-0 flex-1">
         <p className={['font-mono font-semibold uppercase tracking-[0.24em] text-white/36', compact ? 'text-[8px]' : 'text-[10px]'].join(' ')}>{label}</p>
-        <h2 className={['mt-1.5 truncate font-sans font-semibold leading-none tracking-[-0.045em] text-white', compact ? 'text-[21px]' : 'text-[28px]'].join(' ')}>{title}</h2>
+        <h2 className={['mt-1.5 truncate font-sans font-semibold leading-none tracking-[-0.045em] text-white', compact ? 'text-[20px] sm:text-[21px]' : 'text-[24px] sm:text-[28px]'].join(' ')}>{title}</h2>
       </div>
       <MagneticFillButton
         type="button"

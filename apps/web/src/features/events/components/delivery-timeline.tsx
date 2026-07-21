@@ -10,13 +10,13 @@ export function DeliveryTimeline({ attempts }: { attempts: AttemptDto[] }) {
   }
 
   return (
-    <ol className="px-5 pb-[18px] pt-2">
+    <ol className="px-4 pb-[18px] pt-2 sm:px-5">
       {attempts.map((attempt) => {
         const failed = Boolean(attempt.error);
         return (
           <li
             key={attempt.id}
-            className="relative grid min-h-[100px] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-[18px] border-b border-[#262626] py-[14px] last:border-b-0"
+            className="relative grid min-h-[100px] grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4 gap-y-3 border-b border-[#262626] py-[14px] last:border-b-0 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:gap-[18px]"
           >
             {/* Attempt number node */}
             <span
@@ -41,7 +41,7 @@ export function DeliveryTimeline({ attempts }: { attempts: AttemptDto[] }) {
             </div>
 
             {/* Readout: latency + time */}
-            <div className="flex flex-col items-end">
+            <div className="col-start-2 flex flex-row flex-wrap items-center gap-x-3 gap-y-1 sm:col-start-auto sm:flex-col sm:items-end sm:gap-0">
               <span className="font-mono text-[8px] uppercase tracking-[0.13em] text-[#666]">LATENCY</span>
               <strong className="mt-[5px] font-mono text-[22px] text-[#f5f5f5]">
                 {attempt.durationMs}<small className="text-[9px] text-[#666]">ms</small>

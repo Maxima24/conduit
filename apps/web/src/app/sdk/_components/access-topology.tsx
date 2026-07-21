@@ -75,18 +75,18 @@ export function AccessTopology({ entity, grants, selectedGroup, onOpenGroup }: A
   );
 
   return (
-    <section ref={rootRef} className="w-full bg-transparent p-5 sm:p-6">
-      <div className="mb-[18px] flex flex-wrap items-end justify-between gap-6 border-b border-white/[0.07] pb-[18px]">
+    <section ref={rootRef} className="w-full bg-transparent p-3 sm:p-6">
+      <div className="mb-[18px] flex flex-wrap items-end justify-between gap-4 border-b border-white/[0.07] pb-[18px] sm:gap-6">
         <div>
           <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/40">Access topology</p>
-          <h2 className="mt-[5px] font-sans text-[26px] font-semibold leading-[1.08] tracking-[-0.015em] text-white/90">See what this identity can reach</h2>
+          <h2 className="mt-[5px] max-w-[720px] font-sans text-[clamp(20px,6vw,26px)] font-semibold leading-[1.08] tracking-[-0.015em] text-white/90">See what this identity can reach</h2>
         </div>
         <span className="whitespace-nowrap font-mono text-[9px] text-white/40">{activeEndpointCount} of {ENDPOINTS.length} routes open</span>
       </div>
 
-      <div className="access-scroll w-full max-w-full overflow-y-hidden overflow-x-auto rounded-[22px] bg-gradient-to-b from-[#080808]/96 via-[#0b0b0b]/96 to-black/96 p-4">
+      <div className="access-scroll w-full max-w-full overflow-x-auto overflow-y-hidden rounded-[18px] bg-gradient-to-b from-[#080808]/96 via-[#0b0b0b]/96 to-black/96 p-3 sm:rounded-[22px] sm:p-4">
         <div
-          className="relative h-[590px] w-full min-w-[920px] overflow-hidden rounded-[18px] !bg-black/[0.18]"
+          className="relative h-[520px] w-full min-w-[760px] overflow-hidden rounded-[16px] !bg-black/[0.18] sm:h-[590px] sm:min-w-[920px] sm:rounded-[18px]"
         >
           <div className="absolute z-[2] font-mono text-[9px] uppercase tracking-[0.16em] !text-white/40" style={{ left: `${(ENTITY.x / STAGE.width) * 100}%`, top: 16 }}>Identity</div>
           <div className="absolute z-[2] font-mono text-[9px] uppercase tracking-[0.16em] !text-white/40" style={{ left: `${(GROUP.x / STAGE.width) * 100}%`, top: 16 }}>Permission groups</div>
@@ -215,7 +215,7 @@ export function AccessTopology({ entity, grants, selectedGroup, onOpenGroup }: A
         </div>
       </div>
 
-      <div className="mt-4 flex items-center gap-6 px-[10px]">
+      <div className="mt-4 flex flex-wrap items-center gap-4 px-[10px] sm:gap-6">
         <div className="flex items-center gap-2">
           <span className="block h-0.5 w-6 bg-[#A01016]/70" />
           <strong className="font-sans text-[11px] font-medium text-white/40">Allowed route</strong>

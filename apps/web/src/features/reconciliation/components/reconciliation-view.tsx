@@ -21,7 +21,7 @@ const GAP_META: Record<GapType, { label: string; blurb: string }> = {
 function GapRow({ gap }: { gap: GapDto }) {
   const href = gapDeepLink(gap);
   return (
-    <div className="flex items-center justify-between gap-4 border-b border-[var(--color-border)] py-2.5 last:border-0">
+    <div className="flex flex-col gap-3 border-b border-[var(--color-border)] py-2.5 last:border-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
       <div className="min-w-0">
         <p className="text-sm">{gap.detail}</p>
         <p className="text-xs text-[var(--color-muted)]">
@@ -31,12 +31,12 @@ function GapRow({ gap }: { gap: GapDto }) {
       {href ? (
         <Link
           href={href}
-          className="shrink-0 text-xs font-medium text-[var(--color-accent)] hover:underline"
+        className="shrink-0 text-xs font-medium text-[var(--color-accent)] hover:underline"
         >
           {gap.sendId ? 'View send' : 'View event'}
         </Link>
       ) : gap.sendId ? (
-        <span className="shrink-0 font-mono text-xs text-[var(--color-muted)]">{gap.sendId}</span>
+        <span className="max-w-full shrink-0 truncate font-mono text-xs text-[var(--color-muted)] sm:max-w-[220px]">{gap.sendId}</span>
       ) : null}
     </div>
   );
@@ -74,10 +74,10 @@ export function ReconciliationView() {
           const meta = GAP_META[type];
           return (
             <Card key={type}>
-              <div className="mb-3 flex items-center gap-3">
+              <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
                 <Badge tone="warning">{meta.label}</Badge>
                 <span className="text-sm text-[var(--color-muted)]">{meta.blurb}</span>
-                <span className="ml-auto text-sm font-medium tabular-nums">{gaps.length}</span>
+                <span className="text-sm font-medium tabular-nums sm:ml-auto">{gaps.length}</span>
               </div>
               {gaps.map((g) => (
                 <GapRow key={g.id} gap={g} />

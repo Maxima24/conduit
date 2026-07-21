@@ -8,7 +8,7 @@ export function StatsCards() {
   const { data } = useQuery(statsQueryOptions());
 
   return (
-    <div className="grid grid-cols-2 gap-px overflow-hidden rounded-[26px] bg-white/[0.055] sm:grid-cols-3 xl:grid-cols-6">
+    <div className="grid grid-cols-1 gap-px overflow-hidden rounded-[20px] bg-white/[0.055] min-[420px]:grid-cols-2 sm:rounded-[26px] md:grid-cols-3 xl:grid-cols-6">
       <StatCard label="Received" value={data?.eventsReceived ?? '--'} />
       <StatCard label="Processed" value={data?.eventsProcessed ?? '--'} />
       <StatCard label="Duplicates" value={data?.duplicatesRejected ?? '--'} />
