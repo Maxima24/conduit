@@ -76,9 +76,9 @@ export function AppShell({ children }: { children: ReactNode }) {
         <MachineSidebar />
 
         <div ref={routeRef} className={`h-full min-h-0 w-full min-w-0 flex-1 overflow-hidden pb-16 sm:w-auto sm:pb-0 ${sdkChromeLayout ? 'bg-black/[0.14]' : 'bg-black/35 backdrop-blur-md'}`}>
-          <div className="mobile-shell-header flex h-12 shrink-0 items-center justify-between border-b border-white/[0.08] bg-[#070707]/96 px-3 backdrop-blur-xl sm:hidden">
+          <div className="relative z-[150] flex h-12 shrink-0 items-center justify-between border-b border-white/[0.08] bg-[#050505]/98 px-3 backdrop-blur-xl sm:hidden">
             <div className="flex min-w-0 items-center gap-2.5">
-              <span className="relative grid h-8 w-8 shrink-0 place-items-center rounded-[11px] bg-white/[0.045] text-white/90" aria-hidden="true">
+              <span className="relative grid h-8 w-8 shrink-0 place-items-center rounded-[11px] bg-white/[0.055] text-white/90 ring-1 ring-white/[0.08]" aria-hidden="true">
                 <svg viewBox="0 0 44 44" className="h-4.5 w-4.5">
                   <path d="M8 8h11v5h-6v18h6v5H8z" fill="currentColor" />
                   <path d="M25 8h11v28H25v-5h6V13h-6z" fill="currentColor" />
@@ -86,11 +86,11 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </svg>
                 <span className="absolute -bottom-px left-1/2 h-px w-5 -translate-x-1/2 rounded-full bg-[#A01016]" />
               </span>
-              <span className="truncate font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white/72">Conduit</span>
+              <span className="truncate font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white/82">Conduit</span>
             </div>
-            <span className="flex shrink-0 items-center gap-2 font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-white/44">
+            <span className="inline-flex h-8 shrink-0 items-center gap-2 rounded-full bg-white/[0.035] px-2.5 font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-white/58 ring-1 ring-white/[0.06]">
               <Pulse className="h-3.5 w-3.5 text-[var(--app-accent)]" weight="bold" />
-              <span className="hidden min-[380px]:inline">Operational</span>
+              <span className="hidden min-[360px]:inline">Online</span>
             </span>
           </div>
           {children}

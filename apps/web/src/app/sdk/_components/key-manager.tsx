@@ -174,27 +174,27 @@ export function KeyManager() {
       className="relative flex h-[calc(100dvh-118px)] w-full min-w-0 max-w-full flex-col overflow-hidden rounded-none bg-gradient-to-b from-[#080808]/96 via-[#0b0b0b]/96 to-black/96 sm:h-[calc(100dvh-24px)] sm:rounded-r-[28px]"
     >
       <header className="shrink-0 border-b border-white/[0.07] bg-gradient-to-r from-[#080808]/96 via-[#0b0b0b]/96 to-black/96">
-        <div className="flex min-h-[108px] flex-wrap items-center gap-4 px-3 py-4 sm:gap-5 sm:px-5 lg:px-7">
-          <div className="mobile-command-copy w-full min-w-0 sm:w-auto">
+        <div className="flex min-h-0 flex-wrap items-center gap-3 px-3 py-3 sm:min-h-[96px] sm:gap-5 sm:px-5 sm:py-4 lg:px-7">
+          <div className="w-full min-w-0 sm:w-auto">
             <h1 className="font-mono text-[10px] font-medium uppercase tracking-[0.32em] text-white/48 sm:text-[11px]">
               API Keys
             </h1>
-            <p className="mt-3 max-w-[620px] font-body text-base leading-7 text-white/78 sm:text-xl">
+            <p className="mt-2 max-w-[620px] font-body text-sm leading-5 text-white/72 sm:mt-3 sm:text-xl sm:leading-7 sm:text-white/78">
               Create and manage credentials for SDK access.
             </p>
           </div>
 
-          <div className="command-dock grid w-full grid-cols-1 gap-2 min-[420px]:grid-cols-2 sm:ml-auto sm:w-auto sm:flex sm:flex-wrap sm:items-center sm:justify-end">
-            <MagneticFillLink href="/sdk/scopes" fillClassName="bg-[#A01016]" className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-white/[0.04] px-4 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-white/62 hover:bg-white/[0.07] hover:text-white">
+          <div className="grid w-full grid-cols-2 gap-2 sm:ml-auto sm:w-auto sm:flex sm:flex-wrap sm:items-center sm:justify-end">
+            <MagneticFillLink href="/sdk/scopes" fillClassName="bg-[#A01016]" className="inline-flex h-10 items-center justify-center gap-2 rounded-[15px] bg-white/[0.04] px-3 font-mono text-[8px] font-semibold uppercase tracking-[0.12em] text-white/62 hover:bg-white/[0.07] hover:text-white sm:h-11 sm:rounded-2xl sm:px-4 sm:text-[9px] sm:tracking-[0.14em]">
               <ArrowLeft className="h-3.5 w-3.5" /> <span>Permissions</span>
             </MagneticFillLink>
-            <MagneticFillButton type="button" onClick={() => openConstructor()} fillClassName="bg-[#A01016]" className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-[#A01016] px-4 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-white hover:bg-[#bd151d]">
+            <MagneticFillButton type="button" onClick={() => openConstructor()} fillClassName="bg-[#A01016]" className="inline-flex h-10 items-center justify-center gap-2 rounded-[15px] bg-[#A01016] px-3 font-mono text-[8px] font-semibold uppercase tracking-[0.12em] text-white hover:bg-[#bd151d] sm:h-11 sm:rounded-2xl sm:px-4 sm:text-[9px] sm:tracking-[0.14em]">
               <Plus className="h-3.5 w-3.5" /> <span>Generate key</span>
             </MagneticFillButton>
           </div>
         </div>
 
-        <div className="access-scroll flex h-10 items-center gap-4 overflow-x-auto bg-white/[0.025] px-4 font-mono text-[8px] uppercase tracking-[0.15em] text-white/48 sm:px-5 lg:px-7">
+        <div className="access-scroll flex h-8 items-center gap-3 overflow-x-auto bg-white/[0.025] px-3 font-mono text-[7.5px] uppercase tracking-[0.15em] text-white/48 sm:h-10 sm:gap-4 sm:px-5 sm:text-[8px] lg:px-7">
           <VaultRailDatum label="Total keys" value={String(keys.length).padStart(2, '0')} />
           <VaultRailDatum label="Active" value={String(activeCount).padStart(2, '0')} accent />
           <VaultRailDatum label="Rotation" value="90 days" />
@@ -206,10 +206,10 @@ export function KeyManager() {
 
       <div className="access-scroll relative min-h-0 flex-1 overflow-y-auto">
         <div className="relative w-full min-w-0">
-          <div className="flex flex-col gap-3 border-b border-white/[0.07] px-4 py-4 min-[420px]:flex-row min-[420px]:items-end min-[420px]:justify-between sm:px-7 sm:py-5">
+          <div className="flex flex-col gap-2 border-b border-white/[0.07] px-4 py-3 min-[420px]:flex-row min-[420px]:items-end min-[420px]:justify-between sm:gap-3 sm:px-7 sm:py-5">
             <div>
               <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-white/36">Credentials</p>
-              <h2 className="mt-1 font-sans text-[28px] font-semibold tracking-[-0.05em] text-white">API keys</h2>
+              <h2 className="mt-1 font-sans text-[24px] font-semibold tracking-[-0.05em] text-white sm:text-[28px]">API keys</h2>
             </div>
             <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-white/45">{activeCount} active</span>
           </div>
@@ -373,12 +373,12 @@ function CredentialInspector({
     >
       <aside
         ref={drawerRef}
-        className="flex h-full w-full max-w-[540px] flex-col overflow-hidden rounded-none border border-white/[0.08] bg-[#050505]/96 text-white backdrop-blur-2xl sm:rounded-[24px]"
+        className="relative flex h-full w-full max-w-[540px] flex-col overflow-hidden rounded-none border border-white/[0.08] bg-[#050505]/96 text-white backdrop-blur-2xl sm:rounded-[24px]"
         onMouseDown={(event) => event.stopPropagation()}
       >
         <DrawerHeader index="02" label="Credential inspector" title={record.id} compact onClose={() => requestClose()} />
 
-        <div className="access-scroll min-h-0 flex-1 overflow-y-auto">
+        <div className="access-scroll min-h-0 flex-1 overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+8.5rem)] min-[420px]:pb-[calc(env(safe-area-inset-bottom)+5.75rem)]">
           <section className="px-5 py-5 sm:px-6">
             <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.24em] text-white/32">
               {record.environment} / {record.status}
@@ -415,24 +415,24 @@ function CredentialInspector({
           </section>
         </div>
 
-        <div className="grid shrink-0 grid-cols-2 gap-2 border-t border-white/[0.07] bg-black/60 px-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2">
+        <div className="absolute inset-x-0 bottom-0 z-20 grid grid-cols-1 gap-2 border-t border-white/[0.07] bg-black/80 px-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2 backdrop-blur-xl min-[420px]:grid-cols-2">
           <MagneticFillButton
             type="button"
             onClick={() => requestClose(onRotate)}
             fillClassName="bg-[#A01016]"
-            className="inline-flex h-11 min-w-0 items-center justify-center gap-2 rounded-[15px] border border-[#A01016]/50 bg-[#A01016] font-mono text-[7.5px] font-semibold uppercase tracking-[0.12em] text-white hover:border-[#ff5660]/70 hover:bg-[#bd151d] sm:h-12 sm:rounded-[16px] sm:rounded-bl-[22px] sm:text-[8px] sm:tracking-[0.14em]"
+            className="inline-flex h-11 min-w-0 items-center justify-center gap-2 rounded-[15px] border border-[#A01016]/50 bg-[#A01016] font-mono text-[8px] font-semibold uppercase tracking-[0.12em] text-white hover:border-[#ff5660]/70 hover:bg-[#bd151d] sm:h-12 sm:rounded-[16px] sm:rounded-bl-[22px] sm:tracking-[0.14em]"
           >
             <ArrowsClockwise className="h-4 w-4 shrink-0" weight="bold" />
-            <span className="truncate"><span className="sm:hidden">Rotate</span><span className="hidden sm:inline">Rotate credential</span></span>
+            <span className="truncate">Rotate credential</span>
           </MagneticFillButton>
           <MagneticFillButton
             type="button"
             disabled={record.status === 'Revoked'}
             onClick={onRevoke}
             fillClassName="bg-[#A01016]"
-            className="inline-flex h-11 min-w-0 items-center justify-center rounded-[15px] border border-white/[0.055] bg-white/[0.025] font-mono text-[7.5px] font-semibold uppercase tracking-[0.12em] text-red-300/38 hover:border-[#A01016]/45 hover:bg-red-500/10 hover:text-red-100 disabled:pointer-events-none disabled:opacity-35 sm:h-12 sm:rounded-[16px] sm:text-[8px] sm:tracking-[0.14em]"
+            className="inline-flex h-11 min-w-0 items-center justify-center rounded-[15px] border border-white/[0.075] bg-white/[0.035] font-mono text-[8px] font-semibold uppercase tracking-[0.12em] text-red-100/58 hover:border-[#A01016]/45 hover:bg-red-500/10 hover:text-red-100 disabled:pointer-events-none disabled:opacity-35 sm:h-12 sm:rounded-[16px] sm:tracking-[0.14em]"
           >
-            <span className="truncate"><span className="sm:hidden">Revoke</span><span className="hidden sm:inline">Revoke access</span></span>
+            <span className="truncate">Revoke access</span>
           </MagneticFillButton>
         </div>
       </aside>

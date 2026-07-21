@@ -39,6 +39,7 @@ const INITIAL_HISTORY: InspectorEvent[] = [
 export function ScopeManager() {
   const rootRef = useRef<HTMLElement>(null);
   const viewPanelRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [entities] = useState<AccessEntity[]>(ENTITIES);
   const [grants, setGrants] = useState<Record<string, string[]>>(() => structuredClone(INITIAL_GRANTS));
   const [selectedGroup, setSelectedGroup] = useState('events');
@@ -48,6 +49,8 @@ export function ScopeManager() {
   const [activeView, setActiveView] = useState<ScopeView>('permissions');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [inspectorOpen, setInspectorOpen] = useState(false);
   const [focusedEntity, setFocusedEntity] = useState('team-alpha');
   const [connected, setConnected] = useState(true);
   const [entityDropdownOpen, setEntityDropdownOpen] = useState(false);
@@ -145,7 +148,10 @@ export function ScopeManager() {
 
   const executeSearch = () => {
     const query = searchQuery.trim().toLowerCase();
-    if (!query) return;
+    if (!query) {
+      setMobileSearchOpen(false);
+      return;
+    }
 
     const entity = entities.find((item) => (
       item.label.toLowerCase().includes(query) || item.id.toLowerCase().includes(query)
@@ -153,6 +159,7 @@ export function ScopeManager() {
     if (entity) {
       setFocusedEntity(entity.id);
       setSearchQuery('');
+      setMobileSearchOpen(false);
       showNotice(`Context switched to ${entity.label}`);
       return;
     }
@@ -174,6 +181,7 @@ export function ScopeManager() {
       requestPermissionGroupOpen(group.id);
       scrollPermissionGroupIntoView(group.id);
       setSearchQuery('');
+      setMobileSearchOpen(false);
       showNotice(`Focused ${group.label}`);
       return;
     }
@@ -194,6 +202,7 @@ export function ScopeManager() {
           scrollPermissionGroupIntoView(group.id);
           setSearchQuery('');
           setSearchFocused(false);
+          setMobileSearchOpen(false);
           showNotice(`Focused ${group.label}`);
       },
     })),
@@ -213,6 +222,7 @@ export function ScopeManager() {
           }
           setSearchQuery('');
           setSearchFocused(false);
+          setMobileSearchOpen(false);
           showNotice(`Focused ${scope.id}`);
         },
       };
@@ -226,6 +236,7 @@ export function ScopeManager() {
         setFocusedEntity(entity.id);
         setSearchQuery('');
         setSearchFocused(false);
+        setMobileSearchOpen(false);
         showNotice(`Context switched to ${entity.label}`);
       },
     })),
@@ -238,6 +249,7 @@ export function ScopeManager() {
       || item.detail.toLowerCase().includes(normalizedSearchQuery)
     ))
     .slice(0, 9);
+  const searchExpanded = searchFocused || mobileSearchOpen || searchQuery.trim().length > 0;
 
   const pushHistory = (action: string, detail: string, tone: InspectorEvent['tone'] = 'neutral') => {
     setHistory((current) => [
@@ -342,41 +354,59 @@ export function ScopeManager() {
     <main ref={rootRef} className="relative flex h-[calc(100dvh-118px)] min-h-0 min-w-0 max-w-full flex-col overflow-hidden rounded-none bg-gradient-to-b from-[#080808]/96 via-[#0b0b0b]/94 to-black/96 sm:h-[calc(100dvh-24px)] sm:rounded-r-[28px] xl:flex-row">
       <section className="relative z-10 flex min-h-0 min-w-0 flex-1 flex-col overflow-visible">
         <header className="relative z-[120] shrink-0 overflow-visible border-b border-white/[0.07] bg-gradient-to-r from-[#080808]/96 via-[#0b0b0b]/96 to-black/96">
-          <div data-command-head className="relative z-[130] grid min-h-[76px] grid-cols-1 items-center gap-[12px] px-3 py-3 sm:px-5 md:grid-cols-[auto_minmax(260px,1fr)_auto] md:gap-[18px] md:py-3.5">
+          <div data-command-head className="relative z-[130] grid min-h-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-3 py-2.5 sm:px-5 md:min-h-[66px] md:grid-cols-[auto_minmax(260px,1fr)_auto] md:gap-[14px] md:py-3">
             <div className="min-w-0 md:min-w-[190px]">
               {/* <span>Control center</span> */}
-              <h1 className="mt-1.5 font-sans text-[19px] font-semibold text-[#f5faf7]">SDK Policy Engine</h1>
+              <h1 className="font-sans text-[18px] font-semibold text-[#f5faf7] sm:text-[19px]">SDK Policy Engine</h1>
             </div>
 
-            <div className="relative z-[170] min-w-0">
+            <div className="relative z-[170] min-w-0 justify-self-end md:w-full md:justify-self-stretch">
               <form
                 className={[
-                  'group relative grid h-12 items-center gap-2.5 overflow-hidden rounded-2xl border px-3 transition-[background-color,border-color] duration-200 focus-within:border-[#A01016]/75 focus-within:bg-white/[0.045]',
+                  'group relative grid h-11 items-center gap-2.5 overflow-hidden rounded-2xl border px-3 transition-[width,background-color,border-color,transform] duration-300 ease-[cubic-bezier(.23,1,.32,1)] focus-within:border-[#A01016]/75 focus-within:bg-white/[0.045] sm:h-12 md:w-full',
+                  searchExpanded ? 'w-[min(78vw,330px)]' : 'w-11 cursor-pointer px-0',
                   searchFocused
                     ? 'border-[#A01016]/75 bg-white/[0.045]'
                     : 'border-white/[0.08] bg-white/[0.035] hover:bg-white/[0.045]',
                 ].join(' ')}
-                style={{ gridTemplateColumns: 'auto minmax(0, 1fr) auto' }}
+                style={{ gridTemplateColumns: searchExpanded ? 'auto minmax(0, 1fr) auto' : '1fr' }}
+                onClick={() => {
+                  if (!searchExpanded) {
+                    setMobileSearchOpen(true);
+                    window.requestAnimationFrame(() => searchInputRef.current?.focus());
+                  }
+                }}
                 onSubmit={(event) => {
                   event.preventDefault();
                   executeSearch();
                   setSearchFocused(false);
+                  if (!searchQuery.trim()) setMobileSearchOpen(false);
                 }}
               >
-                <MagnifyingGlass weight="bold" className={['h-[17px] w-[17px] transition-colors duration-200', searchFocused ? 'text-[#e2f0e7]/62' : 'text-[#e2f0e7]/50'].join(' ')} />
+                <MagnifyingGlass weight="bold" className={['h-[17px] w-[17px] transition-[color,transform] duration-200', searchFocused ? 'text-[#e2f0e7]/62' : 'text-[#e2f0e7]/50', searchExpanded ? '' : 'mx-auto group-hover:scale-110'].join(' ')} />
                 <input
-                  className="w-full min-w-0 appearance-none border-0 bg-transparent text-[13px] font-sans text-[#f4faf6] outline-none placeholder:text-[#e2f0e7]/30 focus:!outline-none focus-visible:!outline-none focus-visible:!ring-0 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+                  ref={searchInputRef}
+                  className={[
+                    'w-full min-w-0 appearance-none border-0 bg-transparent text-[13px] font-sans text-[#f4faf6] outline-none transition-opacity duration-200 placeholder:text-[#e2f0e7]/30 focus:!outline-none focus-visible:!outline-none focus-visible:!ring-0 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden',
+                    searchExpanded ? 'opacity-100' : 'pointer-events-none absolute opacity-0',
+                  ].join(' ')}
                   type="search"
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
                   onFocus={() => setSearchFocused(true)}
-                  onBlur={() => window.setTimeout(() => setSearchFocused(false), 120)}
+                  onBlur={(event) => {
+                    const nextValue = event.currentTarget.value.trim();
+                    window.setTimeout(() => {
+                      setSearchFocused(false);
+                      if (!nextValue) setMobileSearchOpen(false);
+                    }, 120);
+                  }}
                   placeholder="Search capabilities, scopes, entities..."
                   aria-label="Search SDK capabilities"
                   aria-expanded={searchFocused}
                   aria-controls="sdk-search-panel"
                 />
-                <kbd className={['hidden font-mono text-[8px] uppercase tracking-[0.08em] transition-colors duration-200 sm:block', searchFocused ? 'text-white/45' : 'text-[#e2f0e7]/30'].join(' ')}>Enter</kbd>
+                <kbd className={['hidden font-mono text-[8px] uppercase tracking-[0.08em] transition-colors duration-200 sm:block', searchExpanded ? '' : 'sr-only', searchFocused ? 'text-white/45' : 'text-[#e2f0e7]/30'].join(' ')}>Enter</kbd>
               </form>
 
               {searchFocused ? (
@@ -432,7 +462,7 @@ export function ScopeManager() {
               ) : null}
             </div>
 
-            <div className="flex w-full items-center gap-2 md:w-auto">
+            <div className="col-span-2 flex w-full items-center gap-2 md:col-span-1 md:w-auto">
               {/* ── Custom entity dropdown ─────────────────────── */}
               <div ref={entityDropdownRef} className="relative z-[150] w-full md:w-auto">
                 {/* Trigger */}
@@ -442,7 +472,7 @@ export function ScopeManager() {
                   aria-expanded={entityDropdownOpen}
                   onClick={() => setEntityDropdownOpen((o) => !o)}
                   className={[
-                    'group flex h-[46px] w-full min-w-0 items-center gap-2.5 rounded-full border px-3.5 md:min-w-[168px]',
+                    'group flex h-11 w-full min-w-0 items-center gap-2.5 rounded-full border px-3 md:h-[46px] md:min-w-[168px] md:px-3.5',
                     entityDropdownOpen
                       ? 'border-white/[0.09] bg-[#101010]/96'
                       : 'border-transparent bg-white/[0.035] hover:bg-white/[0.055]',
@@ -450,7 +480,7 @@ export function ScopeManager() {
                 >
                   {/* Entity-type icon badge */}
                   <span className={[
-                    'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl transition-colors duration-200',
+                    'flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-[11px] transition-colors duration-200 sm:h-8 sm:w-8 sm:rounded-xl',
                     focused.type === 'team'
                       ? 'bg-[#A01016]/12 text-[#d14a51]'
                       : 'bg-white/[0.045] text-white/55',
@@ -554,19 +584,32 @@ export function ScopeManager() {
             </div>
           </div>
 
-          <div className="flex min-h-[58px] flex-col items-stretch justify-center gap-3 px-3 py-3 sm:px-5 md:flex-row md:items-center md:justify-between md:py-1.5">
+          <div className="flex min-h-0 flex-col items-stretch justify-center gap-2 px-3 py-2 sm:px-5 md:min-h-[50px] md:flex-row md:items-center md:justify-between md:py-1.5">
             <ScopeViewSwitcher value={activeView} onChange={setActiveView} />
 
-            <div className="access-scroll -mx-3 flex w-[calc(100%+24px)] gap-2 overflow-x-auto px-3 pb-1 md:mx-0 md:ml-auto md:w-auto md:overflow-visible md:px-0 md:pb-0">
-              <span data-status-label className="flex h-[46px] min-w-[124px] shrink-0 items-center rounded-full bg-[#A01016]/10 p-1.5 pr-4 transition-opacity">
-                <span className="mr-3 flex h-[34px] w-[34px] items-center justify-center rounded-full bg-white/5 text-white/50"><Check weight="bold" /></span>
-                <span className="flex flex-col justify-center"><small className="font-sans text-[10px] font-semibold text-white/40">Policy</small><strong className="font-sans text-[12px] font-bold text-[#A01016]">{status}</strong></span>
+              <div className="access-scroll -mx-3 flex w-[calc(100%+24px)] gap-2 overflow-x-auto px-3 pb-1 md:mx-0 md:ml-auto md:w-auto md:overflow-visible md:px-0 md:pb-0">
+              <span data-status-label className="flex h-10 min-w-[112px] shrink-0 items-center rounded-full bg-[#A01016]/10 p-1 pr-3 transition-opacity md:h-[46px] md:min-w-[124px] md:p-1.5 md:pr-4">
+                <span className="mr-2.5 flex h-[30px] w-[30px] items-center justify-center rounded-full bg-white/5 text-white/50 md:mr-3 md:h-[34px] md:w-[34px]"><Check weight="bold" /></span>
+                <span className="flex flex-col justify-center"><small className="font-sans text-[9px] font-semibold text-white/40 md:text-[10px]">Policy</small><strong className="font-sans text-[11px] font-bold text-[#A01016] md:text-[12px]">{status}</strong></span>
               </span>
 
               <div className="flex shrink-0 gap-2 md:flex-wrap md:items-center">
-                <MagneticFillButton type="button" onClick={generatePolicy} fillClassName="bg-[#A01016]" contentClassName="h-full w-full justify-start" className="group flex h-[46px] min-w-[146px] shrink-0 items-center rounded-full bg-white/[0.045] p-1.5 pr-4 text-white hover:bg-white/[0.075] md:min-w-[150px]">
-                  <span className="mr-3 flex h-[34px] w-[34px] items-center justify-center rounded-full bg-white/[0.07] text-white/54 transition-colors group-hover:text-white/90"><FileCode weight="bold" /></span>
-                  <span className="flex flex-col justify-center text-left"><strong className="font-sans text-[11px] font-black uppercase tracking-widest text-white/90">Generate</strong><small className="font-sans text-[8px] font-bold uppercase tracking-widest text-white/40">SDK policy</small></span>
+                <button
+                  type="button"
+                  onClick={() => setInspectorOpen(true)}
+                  className="group flex h-10 min-w-[132px] shrink-0 items-center rounded-full bg-white/[0.045] p-1 pr-3 text-left text-white transition-[background-color,transform] duration-200 hover:scale-[0.965] hover:bg-white/[0.075] active:scale-[0.94] xl:hidden"
+                >
+                  <span className="mr-2.5 flex h-[30px] w-[30px] items-center justify-center rounded-full bg-[#A01016]/14 text-[#d14a51] transition-colors group-hover:bg-[#A01016] group-hover:text-white">
+                    <UserCircle weight="fill" className="h-4 w-4" />
+                  </span>
+                  <span className="flex flex-col justify-center">
+                    <strong className="font-sans text-[10px] font-black uppercase tracking-widest text-white/90">Summary</strong>
+                    <small className="font-mono text-[8px] font-semibold uppercase tracking-[0.12em] text-white/36">{effectiveGrants.length}/18 access</small>
+                  </span>
+                </button>
+                <MagneticFillButton type="button" onClick={generatePolicy} fillClassName="bg-[#A01016]" contentClassName="h-full w-full justify-start" className="group flex h-10 min-w-[122px] shrink-0 items-center rounded-full bg-white/[0.045] p-1 pr-3 text-white hover:bg-white/[0.075] md:h-[46px] md:min-w-[150px] md:p-1.5 md:pr-4">
+                  <span className="mr-2.5 flex h-[30px] w-[30px] items-center justify-center rounded-full bg-white/[0.07] text-white/54 transition-colors group-hover:text-white/90 md:mr-3 md:h-[34px] md:w-[34px]"><FileCode weight="bold" /></span>
+                  <span className="flex flex-col justify-center text-left"><strong className="font-sans text-[10px] font-black uppercase tracking-widest text-white/90 md:text-[11px]">Generate</strong><small className="hidden font-sans text-[8px] font-bold uppercase tracking-widest text-white/40 min-[420px]:block">SDK policy</small></span>
                 </MagneticFillButton>
                 <MagneticFillButton
                   type="button"
@@ -575,14 +618,14 @@ export function ScopeManager() {
                   fillClassName="bg-[#A01016]"
                   contentClassName="h-full w-full justify-start"
                   className={[
-                    'group flex h-[46px] min-w-[120px] shrink-0 items-center rounded-full p-1.5 pr-4 disabled:pointer-events-none md:min-w-[130px]',
+                    'group flex h-10 min-w-[102px] shrink-0 items-center rounded-full p-1 pr-3 disabled:pointer-events-none md:h-[46px] md:min-w-[130px] md:p-1.5 md:pr-4',
                     dirty
                       ? 'bg-white/[0.075] text-white hover:bg-white/[0.105]'
                       : 'bg-white/[0.018] text-white/34 opacity-55',
                   ].join(' ')}
                 >
-                  <span className={['mr-3 flex h-[34px] w-[34px] items-center justify-center rounded-full transition-colors', dirty ? 'bg-white/[0.08] text-white/78 group-hover:text-white' : 'bg-white/[0.035] text-white/22'].join(' ')}><FloppyDisk weight="bold" /></span>
-                  <span className="flex flex-col justify-center text-left"><strong className={['font-sans text-[11px] font-black uppercase tracking-widest', dirty ? 'text-white/95' : 'text-white/38'].join(' ')}>Save</strong><small className={['font-sans text-[8px] font-bold uppercase tracking-widest', dirty ? 'text-white/48' : 'text-white/22'].join(' ')}>Draft</small></span>
+                  <span className={['mr-2.5 flex h-[30px] w-[30px] items-center justify-center rounded-full transition-colors md:mr-3 md:h-[34px] md:w-[34px]', dirty ? 'bg-white/[0.08] text-white/78 group-hover:text-white' : 'bg-white/[0.035] text-white/22'].join(' ')}><FloppyDisk weight="bold" /></span>
+                  <span className="flex flex-col justify-center text-left"><strong className={['font-sans text-[10px] font-black uppercase tracking-widest md:text-[11px]', dirty ? 'text-white/95' : 'text-white/38'].join(' ')}>Save</strong><small className={['hidden font-sans text-[8px] font-bold uppercase tracking-widest min-[420px]:block', dirty ? 'text-white/48' : 'text-white/22'].join(' ')}>Draft</small></span>
                 </MagneticFillButton>
                 <MagneticFillButton
                   type="button"
@@ -591,14 +634,14 @@ export function ScopeManager() {
                   fillClassName="bg-[#A01016]"
                   contentClassName="h-full w-full justify-start"
                   className={[
-                    'group flex h-[46px] min-w-[130px] shrink-0 items-center rounded-full p-1.5 pr-4 disabled:pointer-events-none md:min-w-[140px]',
+                    'group flex h-10 min-w-[112px] shrink-0 items-center rounded-full p-1 pr-3 disabled:pointer-events-none md:h-[46px] md:min-w-[140px] md:p-1.5 md:pr-4',
                     unpublished
                       ? 'bg-[#A01016] text-white hover:bg-[#bd151d]'
                       : 'bg-white/[0.018] text-white/34 opacity-55',
                   ].join(' ')}
                 >
-                  <span className={['mr-3 flex h-[34px] w-[34px] items-center justify-center rounded-full transition-colors', unpublished ? 'bg-white/12 text-white group-hover:bg-white/18' : 'bg-white/[0.035] text-white/22'].join(' ')}><ArrowRight weight="bold" /></span>
-                  <span className="flex flex-col justify-center text-left"><strong className={['font-sans text-[11px] font-black uppercase tracking-widest', unpublished ? 'text-white' : 'text-white/38'].join(' ')}>Publish</strong><small className={['font-sans text-[8px] font-bold uppercase tracking-widest', unpublished ? 'text-white/62' : 'text-white/22'].join(' ')}>Move live</small></span>
+                  <span className={['mr-2.5 flex h-[30px] w-[30px] items-center justify-center rounded-full transition-colors md:mr-3 md:h-[34px] md:w-[34px]', unpublished ? 'bg-white/12 text-white group-hover:bg-white/18' : 'bg-white/[0.035] text-white/22'].join(' ')}><ArrowRight weight="bold" /></span>
+                  <span className="flex flex-col justify-center text-left"><strong className={['font-sans text-[10px] font-black uppercase tracking-widest md:text-[11px]', unpublished ? 'text-white' : 'text-white/38'].join(' ')}>Publish</strong><small className={['hidden font-sans text-[8px] font-bold uppercase tracking-widest min-[420px]:block', unpublished ? 'text-white/62' : 'text-white/22'].join(' ')}>Move live</small></span>
                 </MagneticFillButton>
               </div>
             </div>
@@ -655,6 +698,8 @@ export function ScopeManager() {
         generationKey={generationKey}
         width={inspectorWidth}
         onResizeStart={startResize}
+        mobileOpen={inspectorOpen}
+        onMobileClose={() => setInspectorOpen(false)}
       />
 
       {notice ? (

@@ -7,7 +7,7 @@ import {
   type CSSProperties,
   type PointerEvent,
 } from 'react';
-import { DotsSixVertical, Key, UsersThree } from '@phosphor-icons/react';
+import { DotsSixVertical, Key, UsersThree, X } from '@phosphor-icons/react';
 import { ALL_SCOPES, SCOPE_GROUPS, type AccessEntity } from './access-data';
 import { ENDPOINTS } from './control-data';
 
@@ -27,10 +27,12 @@ type PermissionInspectorProps = {
   generationKey: number;
   width: number;
   onResizeStart: (event: PointerEvent<HTMLButtonElement>) => void;
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
 };
 
 const inspectorShellClass = [
-  'relative flex max-h-[44dvh] min-h-[236px] w-full shrink-0 flex-col overflow-hidden border-t border-white/[0.06] bg-[#050505]/78 text-white backdrop-blur-2xl md:max-h-[38dvh] xl:my-3 xl:mr-3 xl:min-h-0 xl:max-h-none xl:w-[var(--inspector-width)] xl:rounded-r-[24px] xl:border xl:border-white/[0.08]',
+  'fixed inset-x-3 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] top-14 z-[170] flex min-h-0 flex-col overflow-hidden rounded-[24px] border border-white/[0.08] bg-[#050505]/88 text-white backdrop-blur-2xl transition-[opacity,transform] duration-300 ease-[cubic-bezier(.23,1,.32,1)] xl:relative xl:inset-auto xl:z-auto xl:my-3 xl:mr-3 xl:w-[var(--inspector-width)] xl:shrink-0 xl:translate-y-0 xl:rounded-r-[24px] xl:opacity-100',
   'backdrop-saturate-[125%]',
 ].join(' ');
 
@@ -50,16 +52,29 @@ function cx(...classes: string[]) {
 }
 
 export function PermissionInspector(props: PermissionInspectorProps) {
-  const { entity, grants, history, width, onResizeStart } = props;
+  const { entity, grants, history, width, onResizeStart, mobileOpen = false, onMobileClose } = props;
   const risk = useMemo(() => calculateRisk(grants), [grants]);
   const enabledEndpoints = ENDPOINTS.filter((endpoint) => grants.includes(endpoint.scope));
   const EntityIcon = entity.type === 'team' ? UsersThree : Key;
 
   return (
-    <aside
-      style={{ '--inspector-width': `${width}px` } as CSSProperties}
-      className={inspectorShellClass}
-    >
+    <>
+      <button
+        type="button"
+        aria-label="Close access summary"
+        onClick={onMobileClose}
+        className={[
+          'fixed inset-0 z-[160] bg-black/64 backdrop-blur-[3px] transition-opacity duration-300 xl:hidden',
+          mobileOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0',
+        ].join(' ')}
+      />
+      <aside
+        style={{ '--inspector-width': `${width}px` } as CSSProperties}
+        className={[
+          inspectorShellClass,
+          mobileOpen ? 'pointer-events-auto translate-y-0 opacity-100' : 'pointer-events-none translate-y-5 opacity-0 xl:pointer-events-auto',
+        ].join(' ')}
+      >
       <button
         type="button"
         aria-label="Access summary divider"
@@ -76,7 +91,7 @@ export function PermissionInspector(props: PermissionInspectorProps) {
         </span>
       </button>
 
-      <header className={cx('flex min-h-[72px] items-center justify-between border-b border-white/[0.07] bg-transparent px-3 py-3 sm:min-h-[78px] sm:px-5 sm:py-3.5', transparentLayerClass)}>
+      <header className={cx('flex min-h-[72px] items-center justify-between gap-3 border-b border-white/[0.07] bg-transparent px-3 py-3 sm:min-h-[78px] sm:px-5 sm:py-3.5', transparentLayerClass)}>
         <div className="flex items-center gap-3">
           <span className="flex h-10 w-10 items-center justify-center rounded-[13px] border border-white/[0.055] bg-white/[0.035] text-white/70"><EntityIcon weight="duotone" className="h-5 w-5" /></span>
           <div>
@@ -84,6 +99,14 @@ export function PermissionInspector(props: PermissionInspectorProps) {
             <h2 className="mt-1 font-sans text-[17px] font-semibold tracking-[-0.03em] text-white/90">{entity.label}</h2>
           </div>
         </div>
+        <button
+          type="button"
+          aria-label="Close access summary"
+          onClick={onMobileClose}
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-[14px] border border-white/[0.08] bg-white/[0.035] text-white/58 transition-[background-color,border-color,color,transform] duration-200 hover:scale-[0.96] hover:border-[#A01016]/65 hover:bg-[#A01016] hover:text-white xl:hidden"
+        >
+          <X className="h-4 w-4" />
+        </button>
       </header>
 
       <div className={cx('access-scroll min-h-0 flex-1 overflow-y-auto bg-transparent p-2.5 sm:p-3', transparentLayerClass)}>
@@ -173,7 +196,8 @@ export function PermissionInspector(props: PermissionInspectorProps) {
           </div>
         </section>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }
 
