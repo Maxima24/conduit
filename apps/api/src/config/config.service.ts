@@ -10,8 +10,13 @@ export class AppConfigService {
   get nodeEnv() {
     return this.config.get('NODE_ENV', { infer: true });
   }
-  get apiPort() {
-    return this.config.get('API_PORT', { infer: true });
+  /** Port to bind. A host-injected PORT wins over API_PORT — see the schema for why. */
+  get apiPort(): number {
+    return (
+      this.config.get('PORT', { infer: true }) ??
+      this.config.get('API_PORT', { infer: true }) ??
+      3001
+    );
   }
   get databaseUrl() {
     return this.config.get('DATABASE_URL', { infer: true });

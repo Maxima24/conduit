@@ -16,8 +16,16 @@ import { AUTH_HEADER, bearer } from '@conduit/contracts';
  * A real deployment needs a user session in front of this.
  */
 
-const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001').replace(/\/+$/, '');
-const API_KEY = process.env.CONDUIT_API_KEY ?? '';
+/**
+ * `CONDUIT_API_URL` is read at RUNTIME. `NEXT_PUBLIC_*` values are inlined into the bundle at
+ * BUILD time, so a deploy that only sets them at runtime silently proxies to localhost and
+ * every request 502s. The public var stays as a fallback for existing local `.env` files.
+ */
+function apiUrl(): string {
+  const url =
+    process.env.CONDUIT_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  return url.replace(/\/+$/, '');
+}
 
 /** Hop-by-hop and body-shaping headers must not be forwarded verbatim. */
 const STRIPPED_REQUEST_HEADERS = new Set([
@@ -36,13 +44,14 @@ const STRIPPED_RESPONSE_HEADERS = new Set([
 ]);
 
 async function proxy(request: NextRequest, path: string[]): Promise<Response> {
-  const target = `${API_URL}/${path.join('/')}${request.nextUrl.search}`;
+  const target = `${apiUrl()}/${path.join('/')}${request.nextUrl.search}`;
+  const apiKey = process.env.CONDUIT_API_KEY ?? '';
 
   const headers = new Headers();
   request.headers.forEach((value, key) => {
     if (!STRIPPED_REQUEST_HEADERS.has(key.toLowerCase())) headers.set(key, value);
   });
-  if (API_KEY) headers.set(AUTH_HEADER, bearer(API_KEY));
+  if (apiKey) headers.set(AUTH_HEADER, bearer(apiKey));
 
   const hasBody = request.method !== 'GET' && request.method !== 'HEAD';
 

@@ -4,6 +4,12 @@ import { z } from 'zod';
 export const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   API_PORT: z.coerce.number().int().positive().default(3001),
+  /**
+   * Injected by the host (Render, Fly, Heroku…) to tell the process which port to bind. It
+   * wins over API_PORT: bind anywhere else and the platform's health check never connects,
+   * so the deploy fails with a service that is actually running fine.
+   */
+  PORT: z.coerce.number().int().positive().optional(),
   DATABASE_URL: z.string().min(1),
   REDIS_URL: z.string().min(1),
   WEB_ORIGIN: z.string().min(1).default('http://localhost:3000'),
